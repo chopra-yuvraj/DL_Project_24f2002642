@@ -1,1 +1,670 @@
-{"metadata":{"kernelspec":{"language":"python","display_name":"Python 3","name":"python3"},"language_info":{"name":"python","version":"3.12.12","mimetype":"text/x-python","codemirror_mode":{"name":"ipython","version":3},"pygments_lexer":"ipython3","nbconvert_exporter":"python","file_extension":".py"},"kaggle":{"accelerator":"none","dataSources":[{"sourceType":"competition","sourceId":128431,"databundleVersionId":15477148}],"dockerImageVersionId":31259,"isInternetEnabled":true,"language":"python","sourceType":"notebook","isGpuEnabled":false}},"nbformat_minor":4,"nbformat":4,"cells":[{"cell_type":"markdown","source":"# DL&GenAI Project","metadata":{}},{"cell_type":"markdown","source":"## Importing necessary libraries","metadata":{}},{"cell_type":"code","source":"import os\nimport numpy as np\nimport pandas as pd\nimport librosa\nimport warnings\nimport wandb\nfrom tqdm import tqdm\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.preprocessing import LabelEncoder\nimport tensorflow as tf\nfrom tensorflow.keras import models, layers\nfrom kaggle_secrets import UserSecretsClient\n\nwarnings.filterwarnings('ignore')\n\nnetrc_path = os.path.expanduser(\"~/.netrc\")\nif os.path.exists(netrc_path):\n    os.remove(netrc_path)\n\ntry:\n    user_secrets = UserSecretsClient()\n    api_key = user_secrets.get_secret(\"wandb_key\")\n    os.environ[\"WANDB_API_KEY\"] = api_key\n    wandb.login(key=api_key, relogin=True)\nexcept Exception:\n    pass","metadata":{"_uuid":"8f2839f25d086af736a60e9eeb907d3b93b6e0e5","_cell_guid":"b1076dfc-b9ad-4769-8c92-a6c4dae69d19","trusted":true,"execution":{"iopub.status.busy":"2026-02-21T16:10:55.964956Z","iopub.execute_input":"2026-02-21T16:10:55.965211Z","iopub.status.idle":"2026-02-21T16:11:20.216268Z","shell.execute_reply.started":"2026-02-21T16:10:55.965189Z","shell.execute_reply":"2026-02-21T16:11:20.215673Z"}},"outputs":[{"name":"stderr","text":"/usr/local/lib/python3.12/dist-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The 'repr' attribute with value False was provided to the `Field()` function, which has no effect in the context it was used. 'repr' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.\n  warnings.warn(\n/usr/local/lib/python3.12/dist-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The 'frozen' attribute with value True was provided to the `Field()` function, which has no effect in the context it was used. 'frozen' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.\n  warnings.warn(\n2026-02-21 16:11:01.724488: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:467] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\nWARNING: All log messages before absl::InitializeLog() is called are written to STDERR\nE0000 00:00:1771690261.886917      55 cuda_dnn.cc:8579] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered\nE0000 00:00:1771690261.932557      55 cuda_blas.cc:1407] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered\nW0000 00:00:1771690262.325089      55 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\nW0000 00:00:1771690262.325124      55 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\nW0000 00:00:1771690262.325126      55 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\nW0000 00:00:1771690262.325129      55 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n\u001b[34m\u001b[1mwandb\u001b[0m: \u001b[33mWARNING\u001b[0m If you're specifying your api key in code, ensure this code is not shared publicly.\n\u001b[34m\u001b[1mwandb\u001b[0m: \u001b[33mWARNING\u001b[0m Consider setting the WANDB_API_KEY environment variable, or running `wandb login` from the command line.\n","output_type":"stream"}],"execution_count":1},{"cell_type":"markdown","source":"# Feature Extraction Function","metadata":{}},{"cell_type":"code","source":"def get_spectrogram(y_audio, sr, max_len=1292):\n    try:\n        mel_spec = librosa.feature.melspectrogram(y=y_audio, sr=sr, n_mels=128, fmax=8000)\n        mel_spec_db = librosa.power_to_db(mel_spec, ref=np.max)\n        \n        if mel_spec_db.shape[1] < max_len:\n            pad_width = max_len - mel_spec_db.shape[1]\n            mel_spec_db = np.pad(mel_spec_db, pad_width=((0, 0), (0, pad_width)), mode='constant')\n        else:\n            mel_spec_db = mel_spec_db[:, :max_len]\n            \n        return mel_spec_db\n    except Exception:\n        return None","metadata":{"trusted":true,"execution":{"iopub.status.busy":"2026-02-21T16:11:20.217364Z","iopub.execute_input":"2026-02-21T16:11:20.217829Z","iopub.status.idle":"2026-02-21T16:11:20.222564Z","shell.execute_reply.started":"2026-02-21T16:11:20.217805Z","shell.execute_reply":"2026-02-21T16:11:20.222003Z"}},"outputs":[],"execution_count":2},{"cell_type":"markdown","source":"# Preparing Training Data","metadata":{}},{"cell_type":"code","source":"X_images = []\ny_labels = []\n\ntrain_dir = '/kaggle/input/jan-2026-dl-gen-ai-project/messy_mashup/genres_stems'\nnoise_dir = '/kaggle/input/jan-2026-dl-gen-ai-project/messy_mashup/ESC-50-master/audio'\n\ngenres = os.listdir(train_dir)\nnoise_files = []\n\nif os.path.exists(noise_dir):\n    noise_files = [os.path.join(noise_dir, f) for f in os.listdir(noise_dir) if f.endswith('.wav')]\n\nfor genre in genres:\n    genre_path = os.path.join(train_dir, genre)\n    if os.path.isdir(genre_path):\n        song_folders = os.listdir(genre_path)\n        \n        for _ in tqdm(range(len(song_folders))):\n            mixed_y = None\n            sr_val = 22050\n\n            instrument_files = ['drums.wav', 'bass.wav', 'vocals.wav', 'others.wav']\n            \n            for instr in instrument_files:\n                random_song = np.random.choice(song_folders)\n                stem_path = os.path.join(genre_path, random_song, instr)\n                \n                if not os.path.exists(stem_path) and instr == 'others.wav':\n                    stem_path = os.path.join(genre_path, random_song, 'other.wav')\n                    \n                if os.path.exists(stem_path):\n                    try:\n                        audio_y, sr = librosa.load(stem_path, duration=30)\n                        if mixed_y is None:\n                            mixed_y = audio_y\n                        else:\n                            min_len = min(len(mixed_y), len(audio_y))\n                            mixed_y = mixed_y[:min_len] + audio_y[:min_len]\n                    except Exception:\n                        continue\n            \n            if mixed_y is not None and len(noise_files) > 0:\n                try:\n                    random_noise_path = np.random.choice(noise_files)\n                    noise_y, _ = librosa.load(random_noise_path, duration=30)\n                    min_len = min(len(mixed_y), len(noise_y))\n                    mixed_y[:min_len] = mixed_y[:min_len] + (noise_y[:min_len] * 0.3)\n                except Exception:\n                    pass\n            \n            if mixed_y is not None:\n                img = get_spectrogram(mixed_y, sr_val)\n                if img is not None:\n                    X_images.append(img)\n                    y_labels.append(genre)\n\nX = np.array(X_images)[..., np.newaxis] \ny_target = np.array(y_labels)\n\nprint(f\"Dataset Shape: {X.shape}\")","metadata":{"trusted":true,"execution":{"iopub.status.busy":"2026-02-21T16:11:20.223369Z","iopub.execute_input":"2026-02-21T16:11:20.223617Z","iopub.status.idle":"2026-02-21T16:18:01.641955Z","shell.execute_reply.started":"2026-02-21T16:11:20.223589Z","shell.execute_reply":"2026-02-21T16:18:01.641234Z"}},"outputs":[{"name":"stderr","text":"100%|██████████| 100/100 [00:53<00:00,  1.85it/s]\n100%|██████████| 100/100 [00:40<00:00,  2.48it/s]\n100%|██████████| 100/100 [00:40<00:00,  2.48it/s]\n100%|██████████| 100/100 [00:39<00:00,  2.53it/s]\n100%|██████████| 100/100 [00:38<00:00,  2.57it/s]\n100%|██████████| 100/100 [00:35<00:00,  2.83it/s]\n100%|██████████| 100/100 [00:36<00:00,  2.72it/s]\n100%|██████████| 100/100 [00:37<00:00,  2.66it/s]\n100%|██████████| 100/100 [00:38<00:00,  2.60it/s]\n100%|██████████| 100/100 [00:39<00:00,  2.50it/s]","output_type":"stream"},{"name":"stdout","text":"Dataset Shape: (1000, 128, 1292, 1)\n","output_type":"stream"},{"name":"stderr","text":"\n","output_type":"stream"}],"execution_count":3},{"cell_type":"raw","source":"","metadata":{"execution":{"iopub.status.busy":"2026-02-19T11:56:22.390498Z","iopub.execute_input":"2026-02-19T11:56:22.390780Z","iopub.status.idle":"2026-02-19T12:06:55.746864Z","shell.execute_reply.started":"2026-02-19T11:56:22.390761Z","shell.execute_reply":"2026-02-19T12:06:55.745937Z"}},"attachments":{}},{"cell_type":"markdown","source":"# Training Model through W&B","metadata":{}},{"cell_type":"code","source":"run = wandb.init(\n    entity=\"choprayuvraj-iit-madras\",\n    project=\"24f2002642-t12026\",\n    name=\"True-Mashups-VGG\",\n    job_type=\"train\"\n)\n\nlabel_encoder = LabelEncoder()\ny_encoded = label_encoder.fit_transform(y_target)\n\nX_train, X_val, y_train, y_val = train_test_split(X, y_encoded, test_size=0.2, random_state=42)\n\nmodel = models.Sequential([\n    layers.Input(shape=(128, 1292, 1)),\n    \n    layers.Conv2D(32, (3, 3), padding='same', activation='relu'),\n    layers.BatchNormalization(),\n    layers.Conv2D(32, (3, 3), padding='same', activation='relu'),\n    layers.BatchNormalization(),\n    layers.MaxPooling2D((2, 4)),\n    layers.Dropout(0.25),\n    \n    layers.Conv2D(64, (3, 3), padding='same', activation='relu'),\n    layers.BatchNormalization(),\n    layers.Conv2D(64, (3, 3), padding='same', activation='relu'),\n    layers.BatchNormalization(),\n    layers.MaxPooling2D((2, 4)),\n    layers.Dropout(0.25),\n    \n    layers.Conv2D(128, (3, 3), padding='same', activation='relu'),\n    layers.BatchNormalization(),\n    layers.Conv2D(128, (3, 3), padding='same', activation='relu'),\n    layers.BatchNormalization(),\n    layers.MaxPooling2D((2, 4)),\n    layers.Dropout(0.25),\n    \n    layers.GlobalAveragePooling2D(),\n    layers.Dense(256, activation='relu'),\n    layers.Dropout(0.5),\n    layers.Dense(10, activation='softmax')\n])\n\noptimizer = tf.keras.optimizers.Adam(learning_rate=0.001)\n\nmodel.compile(optimizer=optimizer,\n              loss='sparse_categorical_crossentropy',\n              metrics=['accuracy'])\n\nclass SimpleWandbCallback(tf.keras.callbacks.Callback):\n    def on_epoch_end(self, epoch, logs=None):\n        wandb.log(logs)\n\nprint(\"Training VGG on True Mashup Data...\")\nhistory = model.fit(\n    X_train, y_train, \n    epochs=25, \n    batch_size=16,\n    validation_data=(X_val, y_val),\n    callbacks=[SimpleWandbCallback()]\n)\n\nrun.finish()","metadata":{"trusted":true,"execution":{"iopub.status.busy":"2026-02-21T16:18:01.643445Z","iopub.execute_input":"2026-02-21T16:18:01.644116Z","iopub.status.idle":"2026-02-21T16:22:22.337934Z","shell.execute_reply.started":"2026-02-21T16:18:01.644089Z","shell.execute_reply":"2026-02-21T16:22:22.337125Z"}},"outputs":[{"name":"stderr","text":"\u001b[34m\u001b[1mwandb\u001b[0m: W&B API key is configured. Use \u001b[1m`wandb login --relogin`\u001b[0m to force relogin\n","output_type":"stream"},{"output_type":"display_data","data":{"text/plain":"<IPython.core.display.HTML object>","text/html":""},"metadata":{}},{"output_type":"display_data","data":{"text/plain":"<IPython.core.display.HTML object>","text/html":"Tracking run with wandb version 0.22.2"},"metadata":{}},{"output_type":"display_data","data":{"text/plain":"<IPython.core.display.HTML object>","text/html":"Run data is saved locally in <code>/kaggle/working/wandb/run-20260221_161801-kl9ceq1u</code>"},"metadata":{}},{"output_type":"display_data","data":{"text/plain":"<IPython.core.display.HTML object>","text/html":"Syncing run <strong><a href='https://wandb.ai/choprayuvraj-iit-madras/24f2002642-t12026/runs/kl9ceq1u' target=\"_blank\">True-Mashups-VGG</a></strong> to <a href='https://wandb.ai/choprayuvraj-iit-madras/24f2002642-t12026' target=\"_blank\">Weights & Biases</a> (<a href='https://wandb.me/developer-guide' target=\"_blank\">docs</a>)<br>"},"metadata":{}},{"output_type":"display_data","data":{"text/plain":"<IPython.core.display.HTML object>","text/html":" View project at <a href='https://wandb.ai/choprayuvraj-iit-madras/24f2002642-t12026' target=\"_blank\">https://wandb.ai/choprayuvraj-iit-madras/24f2002642-t12026</a>"},"metadata":{}},{"output_type":"display_data","data":{"text/plain":"<IPython.core.display.HTML object>","text/html":" View run at <a href='https://wandb.ai/choprayuvraj-iit-madras/24f2002642-t12026/runs/kl9ceq1u' target=\"_blank\">https://wandb.ai/choprayuvraj-iit-madras/24f2002642-t12026/runs/kl9ceq1u</a>"},"metadata":{}},{"name":"stderr","text":"I0000 00:00:1771690690.308522      55 gpu_device.cc:2019] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 13757 MB memory:  -> device: 0, name: Tesla T4, pci bus id: 0000:00:04.0, compute capability: 7.5\nI0000 00:00:1771690690.314296      55 gpu_device.cc:2019] Created device /job:localhost/replica:0/task:0/device:GPU:1 with 13757 MB memory:  -> device: 1, name: Tesla T4, pci bus id: 0000:00:05.0, compute capability: 7.5\n","output_type":"stream"},{"name":"stdout","text":"Training VGG on True Mashup Data...\nEpoch 1/25\n","output_type":"stream"},{"name":"stderr","text":"WARNING: All log messages before absl::InitializeLog() is called are written to STDERR\nI0000 00:00:1771690696.577500     162 service.cc:152] XLA service 0x7e3881440f20 initialized for platform CUDA (this does not guarantee that XLA will be used). Devices:\nI0000 00:00:1771690696.577540     162 service.cc:160]   StreamExecutor device (0): Tesla T4, Compute Capability 7.5\nI0000 00:00:1771690696.577544     162 service.cc:160]   StreamExecutor device (1): Tesla T4, Compute Capability 7.5\nI0000 00:00:1771690697.338065     162 cuda_dnn.cc:529] Loaded cuDNN version 91002\n2026-02-21 16:18:21.596520: E external/local_xla/xla/stream_executor/cuda/cuda_timer.cc:86] Delay kernel timed out: measured time has sub-optimal accuracy. There may be a missing warmup execution, please investigate in Nsight Systems.\n2026-02-21 16:18:21.779721: E external/local_xla/xla/stream_executor/cuda/cuda_timer.cc:86] Delay kernel timed out: measured time has sub-optimal accuracy. There may be a missing warmup execution, please investigate in Nsight Systems.\n2026-02-21 16:18:22.217908: E external/local_xla/xla/stream_executor/cuda/cuda_timer.cc:86] Delay kernel timed out: measured time has sub-optimal accuracy. There may be a missing warmup execution, please investigate in Nsight Systems.\n2026-02-21 16:18:22.381127: E external/local_xla/xla/stream_executor/cuda/cuda_timer.cc:86] Delay kernel timed out: measured time has sub-optimal accuracy. There may be a missing warmup execution, please investigate in Nsight Systems.\n2026-02-21 16:18:28.087965: E external/local_xla/xla/service/slow_operation_alarm.cc:73] Trying algorithm eng0{} for conv %cudnn-conv-bw-filter.7 = (f32[32,32,3,3]{3,2,1,0}, u8[0]{0}) custom-call(f32[16,32,128,1292]{3,2,1,0} %bitcast.17562, f32[16,32,128,1292]{3,2,1,0} %bitcast.17626), window={size=3x3 pad=1_1x1_1}, dim_labels=bf01_oi01->bf01, custom_call_target=\"__cudnn$convBackwardFilter\", metadata={op_type=\"Conv2DBackpropFilter\" op_name=\"gradient_tape/sequential_1/conv2d_1_2/convolution/Conv2DBackpropFilter\" source_file=\"/usr/local/lib/python3.12/dist-packages/tensorflow/python/framework/ops.py\" source_line=1200}, backend_config={\"operation_queue_id\":\"0\",\"wait_on_operation_queues\":[],\"cudnn_conv_backend_config\":{\"conv_result_scale\":1,\"activation_mode\":\"kNone\",\"side_input_scale\":0,\"leakyrelu_alpha\":0},\"force_earliest_schedule\":false} is taking a while...\n2026-02-21 16:18:28.528129: E external/local_xla/xla/service/slow_operation_alarm.cc:140] The operation took 1.440287892s\nTrying algorithm eng0{} for conv %cudnn-conv-bw-filter.7 = (f32[32,32,3,3]{3,2,1,0}, u8[0]{0}) custom-call(f32[16,32,128,1292]{3,2,1,0} %bitcast.17562, f32[16,32,128,1292]{3,2,1,0} %bitcast.17626), window={size=3x3 pad=1_1x1_1}, dim_labels=bf01_oi01->bf01, custom_call_target=\"__cudnn$convBackwardFilter\", metadata={op_type=\"Conv2DBackpropFilter\" op_name=\"gradient_tape/sequential_1/conv2d_1_2/convolution/Conv2DBackpropFilter\" source_file=\"/usr/local/lib/python3.12/dist-packages/tensorflow/python/framework/ops.py\" source_line=1200}, backend_config={\"operation_queue_id\":\"0\",\"wait_on_operation_queues\":[],\"cudnn_conv_backend_config\":{\"conv_result_scale\":1,\"activation_mode\":\"kNone\",\"side_input_scale\":0,\"leakyrelu_alpha\":0},\"force_earliest_schedule\":false} is taking a while...\nI0000 00:00:1771690714.487305     162 device_compiler.h:188] Compiled cluster using XLA!  This line is logged at most once for the lifetime of the process.\n","output_type":"stream"},{"name":"stdout","text":"\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m35s\u001b[0m 273ms/step - accuracy: 0.2180 - loss: 2.3258 - val_accuracy: 0.1100 - val_loss: 5.6092\nEpoch 2/25\n\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m8s\u001b[0m 163ms/step - accuracy: 0.4178 - loss: 1.5339 - val_accuracy: 0.1200 - val_loss: 4.0182\nEpoch 3/25\n\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m8s\u001b[0m 164ms/step - accuracy: 0.4614 - loss: 1.3560 - val_accuracy: 0.3500 - val_loss: 1.8912\nEpoch 4/25\n\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m8s\u001b[0m 166ms/step - accuracy: 0.5375 - loss: 1.2815 - val_accuracy: 0.0650 - val_loss: 8.0993\nEpoch 5/25\n\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m8s\u001b[0m 168ms/step - accuracy: 0.5491 - loss: 1.2009 - val_accuracy: 0.2600 - val_loss: 3.2697\nEpoch 6/25\n\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m9s\u001b[0m 170ms/step - accuracy: 0.5960 - loss: 1.0888 - val_accuracy: 0.3600 - val_loss: 2.0364\nEpoch 7/25\n\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m9s\u001b[0m 173ms/step - accuracy: 0.6275 - loss: 1.0168 - val_accuracy: 0.2400 - val_loss: 3.5310\nEpoch 8/25\n\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m9s\u001b[0m 173ms/step - accuracy: 0.6527 - loss: 0.9473 - val_accuracy: 0.3100 - val_loss: 2.7349\nEpoch 9/25\n\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m9s\u001b[0m 177ms/step - accuracy: 0.6712 - loss: 0.8299 - val_accuracy: 0.2800 - val_loss: 3.3967\nEpoch 10/25\n\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m9s\u001b[0m 180ms/step - accuracy: 0.6937 - loss: 0.8706 - val_accuracy: 0.0650 - val_loss: 14.6069\nEpoch 11/25\n\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m9s\u001b[0m 184ms/step - accuracy: 0.6650 - loss: 0.8994 - val_accuracy: 0.2050 - val_loss: 5.4209\nEpoch 12/25\n\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m9s\u001b[0m 189ms/step - accuracy: 0.7243 - loss: 0.7438 - val_accuracy: 0.3600 - val_loss: 2.6136\nEpoch 13/25\n\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m9s\u001b[0m 188ms/step - accuracy: 0.7498 - loss: 0.6785 - val_accuracy: 0.3100 - val_loss: 3.7590\nEpoch 14/25\n\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m9s\u001b[0m 184ms/step - accuracy: 0.7608 - loss: 0.7681 - val_accuracy: 0.4900 - val_loss: 1.8980\nEpoch 15/25\n\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m9s\u001b[0m 181ms/step - accuracy: 0.7454 - loss: 0.6753 - val_accuracy: 0.5550 - val_loss: 1.3507\nEpoch 16/25\n\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m9s\u001b[0m 179ms/step - accuracy: 0.8254 - loss: 0.5312 - val_accuracy: 0.5700 - val_loss: 1.4305\nEpoch 17/25\n\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m9s\u001b[0m 178ms/step - accuracy: 0.7842 - loss: 0.5483 - val_accuracy: 0.5500 - val_loss: 1.4946\nEpoch 18/25\n\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m9s\u001b[0m 178ms/step - accuracy: 0.8095 - loss: 0.5183 - val_accuracy: 0.5100 - val_loss: 1.5624\nEpoch 19/25\n\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m9s\u001b[0m 179ms/step - accuracy: 0.8459 - loss: 0.4712 - val_accuracy: 0.5750 - val_loss: 1.3277\nEpoch 20/25\n\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m9s\u001b[0m 180ms/step - accuracy: 0.8603 - loss: 0.4074 - val_accuracy: 0.3550 - val_loss: 2.9857\nEpoch 21/25\n\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m9s\u001b[0m 182ms/step - accuracy: 0.8499 - loss: 0.4421 - val_accuracy: 0.5750 - val_loss: 1.4252\nEpoch 22/25\n\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m9s\u001b[0m 183ms/step - accuracy: 0.8668 - loss: 0.3816 - val_accuracy: 0.2900 - val_loss: 4.0865\nEpoch 23/25\n\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m9s\u001b[0m 183ms/step - accuracy: 0.8750 - loss: 0.3837 - val_accuracy: 0.6900 - val_loss: 1.1811\nEpoch 24/25\n\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m9s\u001b[0m 183ms/step - accuracy: 0.8892 - loss: 0.3393 - val_accuracy: 0.6700 - val_loss: 1.2329\nEpoch 25/25\n\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m9s\u001b[0m 181ms/step - accuracy: 0.8794 - loss: 0.3242 - val_accuracy: 0.2350 - val_loss: 7.1314\n","output_type":"stream"},{"output_type":"display_data","data":{"text/plain":"<IPython.core.display.HTML object>","text/html":""},"metadata":{}},{"output_type":"display_data","data":{"text/plain":"<IPython.core.display.HTML object>","text/html":"<br>    <style><br>        .wandb-row {<br>            display: flex;<br>            flex-direction: row;<br>            flex-wrap: wrap;<br>            justify-content: flex-start;<br>            width: 100%;<br>        }<br>        .wandb-col {<br>            display: flex;<br>            flex-direction: column;<br>            flex-basis: 100%;<br>            flex: 1;<br>            padding: 10px;<br>        }<br>    </style><br><div class=\"wandb-row\"><div class=\"wandb-col\"><h3>Run history:</h3><br/><table class=\"wandb\"><tr><td>accuracy</td><td>▁▃▃▄▄▄▅▅▅▅▆▆▆▇▇▇▇▇▇██████</td></tr><tr><td>loss</td><td>█▆▅▅▄▄▄▃▃▃▃▂▂▂▂▂▂▂▂▁▁▁▁▁▁</td></tr><tr><td>val_accuracy</td><td>▂▂▄▁▃▄▃▄▃▁▃▄▄▆▆▇▆▆▇▄▇▄██▃</td></tr><tr><td>val_loss</td><td>▃▂▁▅▂▁▂▂▂█▃▂▂▁▁▁▁▁▁▂▁▃▁▁▄</td></tr></table><br/></div><div class=\"wandb-col\"><h3>Run summary:</h3><br/><table class=\"wandb\"><tr><td>accuracy</td><td>0.87125</td></tr><tr><td>loss</td><td>0.35864</td></tr><tr><td>val_accuracy</td><td>0.235</td></tr><tr><td>val_loss</td><td>7.1314</td></tr></table><br/></div></div>"},"metadata":{}},{"output_type":"display_data","data":{"text/plain":"<IPython.core.display.HTML object>","text/html":" View run <strong style=\"color:#cdcd00\">True-Mashups-VGG</strong> at: <a href='https://wandb.ai/choprayuvraj-iit-madras/24f2002642-t12026/runs/kl9ceq1u' target=\"_blank\">https://wandb.ai/choprayuvraj-iit-madras/24f2002642-t12026/runs/kl9ceq1u</a><br> View project at: <a href='https://wandb.ai/choprayuvraj-iit-madras/24f2002642-t12026' target=\"_blank\">https://wandb.ai/choprayuvraj-iit-madras/24f2002642-t12026</a><br>Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)"},"metadata":{}},{"output_type":"display_data","data":{"text/plain":"<IPython.core.display.HTML object>","text/html":"Find logs at: <code>./wandb/run-20260221_161801-kl9ceq1u/logs</code>"},"metadata":{}}],"execution_count":4},{"cell_type":"markdown","source":"# Generating Submission File","metadata":{}},{"cell_type":"code","source":"test_csv_path = '/kaggle/input/jan-2026-dl-gen-ai-project/messy_mashup/test.csv'\ntest_dir = '/kaggle/input/jan-2026-dl-gen-ai-project/messy_mashup/mashups'\ntest_df = pd.read_csv(test_csv_path)\n\nactual_files = os.listdir(test_dir)\nid_to_filename = {}\nfor filename in actual_files:\n    if not filename.endswith('.wav'): continue\n    digits = ''.join(filter(str.isdigit, filename))\n    if digits:\n        id_to_filename[int(digits)] = filename\n\nsubmission_data = []\n\nfor index, row in tqdm(test_df.iterrows(), total=len(test_df)):\n    song_id = row['id']\n    filename = id_to_filename.get(song_id)\n    \n    if filename:\n        file_path = os.path.join(test_dir, filename)\n        try:\n            audio_y, sr = librosa.load(file_path, duration=30)\n            img = get_spectrogram(audio_y, sr)\n            \n            if img is not None:\n                img_input = img[np.newaxis, ..., np.newaxis] \n                pred_probs = model.predict(img_input, verbose=0)\n                pred_num = np.argmax(pred_probs)\n                pred_label = label_encoder.inverse_transform([pred_num])[0]\n                submission_data.append([song_id, pred_label])\n            else:\n                submission_data.append([song_id, \"pop\"])\n        except Exception:\n            submission_data.append([song_id, \"pop\"])\n    else:\n        submission_data.append([song_id, \"pop\"])\n\nsubmission_df = pd.DataFrame(submission_data, columns=['id', 'genre'])\nsubmission_df.to_csv('submission.csv', index=False)\nprint(submission_df.head())","metadata":{"trusted":true,"execution":{"iopub.status.busy":"2026-02-21T16:22:22.339163Z","iopub.execute_input":"2026-02-21T16:22:22.339717Z","iopub.status.idle":"2026-02-21T16:31:21.358525Z","shell.execute_reply.started":"2026-02-21T16:22:22.339675Z","shell.execute_reply":"2026-02-21T16:31:21.357898Z"}},"outputs":[{"name":"stderr","text":"100%|██████████| 3020/3020 [08:58<00:00,  5.60it/s]","output_type":"stream"},{"name":"stdout","text":"   id    genre\n0   1  country\n1   2     jazz\n2   3  country\n3   4     jazz\n4   5  country\n","output_type":"stream"},{"name":"stderr","text":"\n","output_type":"stream"}],"execution_count":5}]}
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "49cd8831",
+   "metadata": {
+    "papermill": {
+     "duration": 0.003545,
+     "end_time": "2026-02-21T16:34:56.790348",
+     "exception": false,
+     "start_time": "2026-02-21T16:34:56.786803",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "# DL&GenAI Project"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "2c5bc52c",
+   "metadata": {
+    "papermill": {
+     "duration": 0.002404,
+     "end_time": "2026-02-21T16:34:56.795550",
+     "exception": false,
+     "start_time": "2026-02-21T16:34:56.793146",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "## Importing necessary libraries"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "4c76289d",
+   "metadata": {
+    "_cell_guid": "b1076dfc-b9ad-4769-8c92-a6c4dae69d19",
+    "_uuid": "8f2839f25d086af736a60e9eeb907d3b93b6e0e5",
+    "execution": {
+     "iopub.execute_input": "2026-02-21T16:34:56.802027Z",
+     "iopub.status.busy": "2026-02-21T16:34:56.801619Z",
+     "iopub.status.idle": "2026-02-21T16:35:19.729519Z",
+     "shell.execute_reply": "2026-02-21T16:35:19.728523Z"
+    },
+    "papermill": {
+     "duration": 22.933534,
+     "end_time": "2026-02-21T16:35:19.731451",
+     "exception": false,
+     "start_time": "2026-02-21T16:34:56.797917",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "/usr/local/lib/python3.12/dist-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The 'repr' attribute with value False was provided to the `Field()` function, which has no effect in the context it was used. 'repr' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.\n",
+      "  warnings.warn(\n",
+      "/usr/local/lib/python3.12/dist-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The 'frozen' attribute with value True was provided to the `Field()` function, which has no effect in the context it was used. 'frozen' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.\n",
+      "  warnings.warn(\n",
+      "2026-02-21 16:35:04.660066: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:467] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\n",
+      "WARNING: All log messages before absl::InitializeLog() is called are written to STDERR\n",
+      "E0000 00:00:1771691704.860616      17 cuda_dnn.cc:8579] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered\n",
+      "E0000 00:00:1771691704.918790      17 cuda_blas.cc:1407] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered\n",
+      "W0000 00:00:1771691705.402323      17 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
+      "W0000 00:00:1771691705.402375      17 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
+      "W0000 00:00:1771691705.402378      17 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
+      "W0000 00:00:1771691705.402381      17 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: \u001b[33mWARNING\u001b[0m If you're specifying your api key in code, ensure this code is not shared publicly.\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: \u001b[33mWARNING\u001b[0m Consider setting the WANDB_API_KEY environment variable, or running `wandb login` from the command line.\n"
+     ]
+    }
+   ],
+   "source": [
+    "import os\n",
+    "import numpy as np\n",
+    "import pandas as pd\n",
+    "import librosa\n",
+    "import warnings\n",
+    "import wandb\n",
+    "from tqdm import tqdm\n",
+    "from sklearn.model_selection import train_test_split\n",
+    "from sklearn.preprocessing import LabelEncoder\n",
+    "import tensorflow as tf\n",
+    "from tensorflow.keras import models, layers\n",
+    "from kaggle_secrets import UserSecretsClient\n",
+    "\n",
+    "warnings.filterwarnings('ignore')\n",
+    "\n",
+    "netrc_path = os.path.expanduser(\"~/.netrc\")\n",
+    "if os.path.exists(netrc_path):\n",
+    "    os.remove(netrc_path)\n",
+    "\n",
+    "try:\n",
+    "    user_secrets = UserSecretsClient()\n",
+    "    api_key = user_secrets.get_secret(\"wandb_key\")\n",
+    "    os.environ[\"WANDB_API_KEY\"] = api_key\n",
+    "    wandb.login(key=api_key, relogin=True)\n",
+    "except Exception:\n",
+    "    pass"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "c7d8dc3f",
+   "metadata": {
+    "papermill": {
+     "duration": 0.002682,
+     "end_time": "2026-02-21T16:35:19.736974",
+     "exception": false,
+     "start_time": "2026-02-21T16:35:19.734292",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "# Feature Extraction Function"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "b7744125",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-21T16:35:19.744232Z",
+     "iopub.status.busy": "2026-02-21T16:35:19.743466Z",
+     "iopub.status.idle": "2026-02-21T16:35:19.749962Z",
+     "shell.execute_reply": "2026-02-21T16:35:19.749109Z"
+    },
+    "papermill": {
+     "duration": 0.012236,
+     "end_time": "2026-02-21T16:35:19.751776",
+     "exception": false,
+     "start_time": "2026-02-21T16:35:19.739540",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "def get_spectrogram(y_audio, sr, max_len=1292):\n",
+    "    try:\n",
+    "        mel_spec = librosa.feature.melspectrogram(y=y_audio, sr=sr, n_mels=128, fmax=8000)\n",
+    "        mel_spec_db = librosa.power_to_db(mel_spec, ref=np.max)\n",
+    "        \n",
+    "        if mel_spec_db.shape[1] < max_len:\n",
+    "            pad_width = max_len - mel_spec_db.shape[1]\n",
+    "            mel_spec_db = np.pad(mel_spec_db, pad_width=((0, 0), (0, pad_width)), mode='constant')\n",
+    "        else:\n",
+    "            mel_spec_db = mel_spec_db[:, :max_len]\n",
+    "            \n",
+    "        return mel_spec_db\n",
+    "    except Exception:\n",
+    "        return None"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "ba362775",
+   "metadata": {
+    "papermill": {
+     "duration": 0.0026,
+     "end_time": "2026-02-21T16:35:19.757271",
+     "exception": false,
+     "start_time": "2026-02-21T16:35:19.754671",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "# Preparing Training Data"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "8fcc9b30",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-21T16:35:19.764380Z",
+     "iopub.status.busy": "2026-02-21T16:35:19.764010Z",
+     "iopub.status.idle": "2026-02-21T16:45:11.352601Z",
+     "shell.execute_reply": "2026-02-21T16:45:11.351024Z"
+    },
+    "papermill": {
+     "duration": 591.595737,
+     "end_time": "2026-02-21T16:45:11.355506",
+     "exception": false,
+     "start_time": "2026-02-21T16:35:19.759769",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "100%|██████████| 100/100 [01:08<00:00,  1.45it/s]\n",
+      "100%|██████████| 100/100 [00:53<00:00,  1.88it/s]\n",
+      "100%|██████████| 100/100 [00:52<00:00,  1.90it/s]\n",
+      "100%|██████████| 100/100 [00:54<00:00,  1.85it/s]\n",
+      "100%|██████████| 100/100 [00:54<00:00,  1.84it/s]\n",
+      "100%|██████████| 100/100 [00:57<00:00,  1.75it/s]\n",
+      "100%|██████████| 100/100 [00:56<00:00,  1.77it/s]\n",
+      "100%|██████████| 100/100 [00:59<00:00,  1.67it/s]\n",
+      "100%|██████████| 100/100 [01:18<00:00,  1.27it/s]\n",
+      "100%|██████████| 100/100 [00:55<00:00,  1.82it/s]\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Dataset Shape: (1000, 128, 1292, 1)\n"
+     ]
+    }
+   ],
+   "source": [
+    "X_images = []\n",
+    "y_labels = []\n",
+    "\n",
+    "train_dir = '/kaggle/input/jan-2026-dl-gen-ai-project/messy_mashup/genres_stems'\n",
+    "noise_dir = '/kaggle/input/jan-2026-dl-gen-ai-project/messy_mashup/ESC-50-master/audio'\n",
+    "\n",
+    "genres = os.listdir(train_dir)\n",
+    "noise_files = []\n",
+    "\n",
+    "if os.path.exists(noise_dir):\n",
+    "    noise_files = [os.path.join(noise_dir, f) for f in os.listdir(noise_dir) if f.endswith('.wav')]\n",
+    "\n",
+    "for genre in genres:\n",
+    "    genre_path = os.path.join(train_dir, genre)\n",
+    "    if os.path.isdir(genre_path):\n",
+    "        song_folders = os.listdir(genre_path)\n",
+    "        \n",
+    "        for _ in tqdm(range(len(song_folders))):\n",
+    "            mixed_y = None\n",
+    "            sr_val = 22050\n",
+    "\n",
+    "            instrument_files = ['drums.wav', 'bass.wav', 'vocals.wav', 'others.wav']\n",
+    "            \n",
+    "            for instr in instrument_files:\n",
+    "                random_song = np.random.choice(song_folders)\n",
+    "                stem_path = os.path.join(genre_path, random_song, instr)\n",
+    "                \n",
+    "                if not os.path.exists(stem_path) and instr == 'others.wav':\n",
+    "                    stem_path = os.path.join(genre_path, random_song, 'other.wav')\n",
+    "                    \n",
+    "                if os.path.exists(stem_path):\n",
+    "                    try:\n",
+    "                        audio_y, sr = librosa.load(stem_path, duration=30)\n",
+    "                        if mixed_y is None:\n",
+    "                            mixed_y = audio_y\n",
+    "                        else:\n",
+    "                            min_len = min(len(mixed_y), len(audio_y))\n",
+    "                            mixed_y = mixed_y[:min_len] + audio_y[:min_len]\n",
+    "                    except Exception:\n",
+    "                        continue\n",
+    "            \n",
+    "            if mixed_y is not None and len(noise_files) > 0:\n",
+    "                try:\n",
+    "                    random_noise_path = np.random.choice(noise_files)\n",
+    "                    noise_y, _ = librosa.load(random_noise_path, duration=30)\n",
+    "                    min_len = min(len(mixed_y), len(noise_y))\n",
+    "                    mixed_y[:min_len] = mixed_y[:min_len] + (noise_y[:min_len] * 0.3)\n",
+    "                except Exception:\n",
+    "                    pass\n",
+    "            \n",
+    "            if mixed_y is not None:\n",
+    "                img = get_spectrogram(mixed_y, sr_val)\n",
+    "                if img is not None:\n",
+    "                    X_images.append(img)\n",
+    "                    y_labels.append(genre)\n",
+    "\n",
+    "X = np.array(X_images)[..., np.newaxis] \n",
+    "y_target = np.array(y_labels)\n",
+    "\n",
+    "print(f\"Dataset Shape: {X.shape}\")"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "raw",
+   "id": "04c24b60",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-19T11:56:22.390780Z",
+     "iopub.status.busy": "2026-02-19T11:56:22.390498Z",
+     "iopub.status.idle": "2026-02-19T12:06:55.746864Z",
+     "shell.execute_reply": "2026-02-19T12:06:55.745937Z",
+     "shell.execute_reply.started": "2026-02-19T11:56:22.390761Z"
+    },
+    "papermill": {
+     "duration": 0.050981,
+     "end_time": "2026-02-21T16:45:11.458459",
+     "exception": false,
+     "start_time": "2026-02-21T16:45:11.407478",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": []
+  },
+  {
+   "cell_type": "markdown",
+   "id": "0b6fa7be",
+   "metadata": {
+    "papermill": {
+     "duration": 0.05068,
+     "end_time": "2026-02-21T16:45:11.561345",
+     "exception": false,
+     "start_time": "2026-02-21T16:45:11.510665",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "# Training Model through W&B"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "id": "340b8e9f",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-21T16:45:11.667208Z",
+     "iopub.status.busy": "2026-02-21T16:45:11.664760Z",
+     "iopub.status.idle": "2026-02-21T19:55:28.253496Z",
+     "shell.execute_reply": "2026-02-21T19:55:28.251913Z"
+    },
+    "papermill": {
+     "duration": 11416.647035,
+     "end_time": "2026-02-21T19:55:28.258737",
+     "exception": false,
+     "start_time": "2026-02-21T16:45:11.611702",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "\u001b[34m\u001b[1mwandb\u001b[0m: W&B API key is configured. Use \u001b[1m`wandb login --relogin`\u001b[0m to force relogin\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: setting up run cawhtgfq\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: Tracking run with wandb version 0.22.2\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: Run data is saved locally in \u001b[35m\u001b[1m/kaggle/working/wandb/run-20260221_164512-cawhtgfq\u001b[0m\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: Run \u001b[1m`wandb offline`\u001b[0m to turn off syncing.\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: Syncing run \u001b[33mTrue-Mashups-VGG\u001b[0m\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: ⭐️ View project at \u001b[34m\u001b[4mhttps://wandb.ai/choprayuvraj-iit-madras/24f2002642-t12026\u001b[0m\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: 🚀 View run at \u001b[34m\u001b[4mhttps://wandb.ai/choprayuvraj-iit-madras/24f2002642-t12026/runs/cawhtgfq\u001b[0m\n",
+      "2026-02-21 16:45:15.056583: E external/local_xla/xla/stream_executor/cuda/cuda_platform.cc:51] failed call to cuInit: INTERNAL: CUDA error: Failed call to cuInit: UNKNOWN ERROR (303)\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Training VGG on True Mashup Data...\n",
+      "Epoch 1/25\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m435s\u001b[0m 9s/step - accuracy: 0.2369 - loss: 2.2612 - val_accuracy: 0.1350 - val_loss: 2.8230\n",
+      "Epoch 2/25\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m452s\u001b[0m 9s/step - accuracy: 0.4092 - loss: 1.5154 - val_accuracy: 0.3850 - val_loss: 1.6661\n",
+      "Epoch 3/25\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m470s\u001b[0m 9s/step - accuracy: 0.4643 - loss: 1.3987 - val_accuracy: 0.1700 - val_loss: 2.9486\n",
+      "Epoch 4/25\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m475s\u001b[0m 10s/step - accuracy: 0.5660 - loss: 1.2524 - val_accuracy: 0.2250 - val_loss: 2.4508\n",
+      "Epoch 5/25\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m434s\u001b[0m 9s/step - accuracy: 0.5532 - loss: 1.1801 - val_accuracy: 0.4450 - val_loss: 1.5922\n",
+      "Epoch 6/25\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m466s\u001b[0m 9s/step - accuracy: 0.5834 - loss: 1.1219 - val_accuracy: 0.3800 - val_loss: 2.0156\n",
+      "Epoch 7/25\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m503s\u001b[0m 9s/step - accuracy: 0.6420 - loss: 1.0097 - val_accuracy: 0.1700 - val_loss: 4.7029\n",
+      "Epoch 8/25\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m439s\u001b[0m 9s/step - accuracy: 0.6354 - loss: 1.0417 - val_accuracy: 0.2550 - val_loss: 2.6355\n",
+      "Epoch 9/25\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m463s\u001b[0m 9s/step - accuracy: 0.6504 - loss: 0.9626 - val_accuracy: 0.2350 - val_loss: 2.4474\n",
+      "Epoch 10/25\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m476s\u001b[0m 10s/step - accuracy: 0.7222 - loss: 0.8310 - val_accuracy: 0.4850 - val_loss: 1.6194\n",
+      "Epoch 11/25\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m474s\u001b[0m 9s/step - accuracy: 0.7101 - loss: 0.8190 - val_accuracy: 0.3450 - val_loss: 2.4409\n",
+      "Epoch 12/25\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m447s\u001b[0m 9s/step - accuracy: 0.7221 - loss: 0.8145 - val_accuracy: 0.5350 - val_loss: 1.4163\n",
+      "Epoch 13/25\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m479s\u001b[0m 10s/step - accuracy: 0.7449 - loss: 0.7416 - val_accuracy: 0.1850 - val_loss: 4.1406\n",
+      "Epoch 14/25\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m470s\u001b[0m 9s/step - accuracy: 0.7816 - loss: 0.6302 - val_accuracy: 0.4250 - val_loss: 2.7630\n",
+      "Epoch 15/25\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m445s\u001b[0m 9s/step - accuracy: 0.7755 - loss: 0.6642 - val_accuracy: 0.4900 - val_loss: 1.5039\n",
+      "Epoch 16/25\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m498s\u001b[0m 9s/step - accuracy: 0.8099 - loss: 0.5169 - val_accuracy: 0.4600 - val_loss: 2.2040\n",
+      "Epoch 17/25\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m438s\u001b[0m 9s/step - accuracy: 0.8142 - loss: 0.5026 - val_accuracy: 0.4800 - val_loss: 2.4119\n",
+      "Epoch 18/25\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m439s\u001b[0m 9s/step - accuracy: 0.8638 - loss: 0.4017 - val_accuracy: 0.8000 - val_loss: 0.5844\n",
+      "Epoch 19/25\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m442s\u001b[0m 9s/step - accuracy: 0.7871 - loss: 0.5651 - val_accuracy: 0.6200 - val_loss: 1.1838\n",
+      "Epoch 20/25\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m436s\u001b[0m 9s/step - accuracy: 0.8482 - loss: 0.4099 - val_accuracy: 0.5400 - val_loss: 1.7062\n",
+      "Epoch 21/25\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m441s\u001b[0m 9s/step - accuracy: 0.8494 - loss: 0.4539 - val_accuracy: 0.5150 - val_loss: 1.8086\n",
+      "Epoch 22/25\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m444s\u001b[0m 9s/step - accuracy: 0.8640 - loss: 0.3636 - val_accuracy: 0.5600 - val_loss: 1.3971\n",
+      "Epoch 23/25\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m445s\u001b[0m 9s/step - accuracy: 0.8941 - loss: 0.3458 - val_accuracy: 0.6050 - val_loss: 1.7323\n",
+      "Epoch 24/25\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m440s\u001b[0m 9s/step - accuracy: 0.8836 - loss: 0.3461 - val_accuracy: 0.5650 - val_loss: 1.8154\n",
+      "Epoch 25/25\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m462s\u001b[0m 9s/step - accuracy: 0.8978 - loss: 0.3128 - val_accuracy: 0.5300 - val_loss: 2.1983\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "\u001b[34m\u001b[1mwandb\u001b[0m: updating run metadata\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: \n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: Run history:\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m:     accuracy ▁▂▃▄▄▄▅▅▅▆▆▆▆▇▆▇▇▇▇▇▇████\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m:         loss █▆▅▅▅▅▄▄▄▃▃▃▃▂▂▂▂▂▂▁▁▁▁▁▁\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: val_accuracy ▁▄▁▂▄▄▁▂▂▅▃▅▂▄▅▄▅█▆▅▅▅▆▆▅\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m:     val_loss ▅▃▅▄▃▃█▄▄▃▄▂▇▅▃▄▄▁▂▃▃▂▃▃▄\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: \n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: Run summary:\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m:     accuracy 0.88875\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m:         loss 0.34043\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: val_accuracy 0.53\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m:     val_loss 2.19829\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: \n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: 🚀 View run \u001b[33mTrue-Mashups-VGG\u001b[0m at: \u001b[34m\u001b[4mhttps://wandb.ai/choprayuvraj-iit-madras/24f2002642-t12026/runs/cawhtgfq\u001b[0m\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: ⭐️ View project at: \u001b[34m\u001b[4mhttps://wandb.ai/choprayuvraj-iit-madras/24f2002642-t12026\u001b[0m\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: Find logs at: \u001b[35m\u001b[1m./wandb/run-20260221_164512-cawhtgfq/logs\u001b[0m\n"
+     ]
+    }
+   ],
+   "source": [
+    "run = wandb.init(\n",
+    "    entity=\"choprayuvraj-iit-madras\",\n",
+    "    project=\"24f2002642-t12026\",\n",
+    "    name=\"True-Mashups-VGG\",\n",
+    "    job_type=\"train\"\n",
+    ")\n",
+    "\n",
+    "label_encoder = LabelEncoder()\n",
+    "y_encoded = label_encoder.fit_transform(y_target)\n",
+    "\n",
+    "X_train, X_val, y_train, y_val = train_test_split(X, y_encoded, test_size=0.2, random_state=42)\n",
+    "\n",
+    "model = models.Sequential([\n",
+    "    layers.Input(shape=(128, 1292, 1)),\n",
+    "    \n",
+    "    layers.Conv2D(32, (3, 3), padding='same', activation='relu'),\n",
+    "    layers.BatchNormalization(),\n",
+    "    layers.Conv2D(32, (3, 3), padding='same', activation='relu'),\n",
+    "    layers.BatchNormalization(),\n",
+    "    layers.MaxPooling2D((2, 4)),\n",
+    "    layers.Dropout(0.25),\n",
+    "    \n",
+    "    layers.Conv2D(64, (3, 3), padding='same', activation='relu'),\n",
+    "    layers.BatchNormalization(),\n",
+    "    layers.Conv2D(64, (3, 3), padding='same', activation='relu'),\n",
+    "    layers.BatchNormalization(),\n",
+    "    layers.MaxPooling2D((2, 4)),\n",
+    "    layers.Dropout(0.25),\n",
+    "    \n",
+    "    layers.Conv2D(128, (3, 3), padding='same', activation='relu'),\n",
+    "    layers.BatchNormalization(),\n",
+    "    layers.Conv2D(128, (3, 3), padding='same', activation='relu'),\n",
+    "    layers.BatchNormalization(),\n",
+    "    layers.MaxPooling2D((2, 4)),\n",
+    "    layers.Dropout(0.25),\n",
+    "    \n",
+    "    layers.GlobalAveragePooling2D(),\n",
+    "    layers.Dense(256, activation='relu'),\n",
+    "    layers.Dropout(0.5),\n",
+    "    layers.Dense(10, activation='softmax')\n",
+    "])\n",
+    "\n",
+    "optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)\n",
+    "\n",
+    "model.compile(optimizer=optimizer,\n",
+    "              loss='sparse_categorical_crossentropy',\n",
+    "              metrics=['accuracy'])\n",
+    "\n",
+    "class SimpleWandbCallback(tf.keras.callbacks.Callback):\n",
+    "    def on_epoch_end(self, epoch, logs=None):\n",
+    "        wandb.log(logs)\n",
+    "\n",
+    "print(\"Training VGG on True Mashup Data...\")\n",
+    "history = model.fit(\n",
+    "    X_train, y_train, \n",
+    "    epochs=25, \n",
+    "    batch_size=16,\n",
+    "    validation_data=(X_val, y_val),\n",
+    "    callbacks=[SimpleWandbCallback()]\n",
+    ")\n",
+    "\n",
+    "run.finish()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "58921826",
+   "metadata": {
+    "papermill": {
+     "duration": 0.119499,
+     "end_time": "2026-02-21T19:55:28.530437",
+     "exception": false,
+     "start_time": "2026-02-21T19:55:28.410938",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "# Generating Submission File"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "8d538663",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-02-21T19:55:28.775484Z",
+     "iopub.status.busy": "2026-02-21T19:55:28.774952Z",
+     "iopub.status.idle": "2026-02-21T20:11:00.601542Z",
+     "shell.execute_reply": "2026-02-21T20:11:00.600545Z"
+    },
+    "papermill": {
+     "duration": 931.952172,
+     "end_time": "2026-02-21T20:11:00.603629",
+     "exception": false,
+     "start_time": "2026-02-21T19:55:28.651457",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "100%|██████████| 3020/3020 [15:31<00:00,  3.24it/s]"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "   id   genre\n",
+      "0   1  hiphop\n",
+      "1   2   metal\n",
+      "2   3  hiphop\n",
+      "3   4   metal\n",
+      "4   5   metal\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "\n"
+     ]
+    }
+   ],
+   "source": [
+    "test_csv_path = '/kaggle/input/jan-2026-dl-gen-ai-project/messy_mashup/test.csv'\n",
+    "test_dir = '/kaggle/input/jan-2026-dl-gen-ai-project/messy_mashup/mashups'\n",
+    "test_df = pd.read_csv(test_csv_path)\n",
+    "\n",
+    "actual_files = os.listdir(test_dir)\n",
+    "id_to_filename = {}\n",
+    "for filename in actual_files:\n",
+    "    if not filename.endswith('.wav'): continue\n",
+    "    digits = ''.join(filter(str.isdigit, filename))\n",
+    "    if digits:\n",
+    "        id_to_filename[int(digits)] = filename\n",
+    "\n",
+    "submission_data = []\n",
+    "\n",
+    "for index, row in tqdm(test_df.iterrows(), total=len(test_df)):\n",
+    "    song_id = row['id']\n",
+    "    filename = id_to_filename.get(song_id)\n",
+    "    \n",
+    "    if filename:\n",
+    "        file_path = os.path.join(test_dir, filename)\n",
+    "        try:\n",
+    "            audio_y, sr = librosa.load(file_path, duration=30)\n",
+    "            img = get_spectrogram(audio_y, sr)\n",
+    "            \n",
+    "            if img is not None:\n",
+    "                img_input = img[np.newaxis, ..., np.newaxis] \n",
+    "                pred_probs = model.predict(img_input, verbose=0)\n",
+    "                pred_num = np.argmax(pred_probs)\n",
+    "                pred_label = label_encoder.inverse_transform([pred_num])[0]\n",
+    "                submission_data.append([song_id, pred_label])\n",
+    "            else:\n",
+    "                submission_data.append([song_id, \"pop\"])\n",
+    "        except Exception:\n",
+    "            submission_data.append([song_id, \"pop\"])\n",
+    "    else:\n",
+    "        submission_data.append([song_id, \"pop\"])\n",
+    "\n",
+    "submission_df = pd.DataFrame(submission_data, columns=['id', 'genre'])\n",
+    "submission_df.to_csv('submission.csv', index=False)\n",
+    "print(submission_df.head())"
+   ]
+  }
+ ],
+ "metadata": {
+  "kaggle": {
+   "accelerator": "none",
+   "dataSources": [
+    {
+     "databundleVersionId": 15477148,
+     "sourceId": 128431,
+     "sourceType": "competition"
+    }
+   ],
+   "dockerImageVersionId": 31259,
+   "isGpuEnabled": false,
+   "isInternetEnabled": true,
+   "language": "python",
+   "sourceType": "notebook"
+  },
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.12.12"
+  },
+  "papermill": {
+   "default_parameters": {},
+   "duration": 12970.799894,
+   "end_time": "2026-02-21T20:11:04.508479",
+   "environment_variables": {},
+   "exception": null,
+   "input_path": "__notebook__.ipynb",
+   "output_path": "__notebook__.ipynb",
+   "parameters": {},
+   "start_time": "2026-02-21T16:34:53.708585",
+   "version": "2.6.0"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
