@@ -2,13 +2,13 @@
  "cells": [
   {
    "cell_type": "markdown",
-   "id": "486e18ec",
+   "id": "06b4ecc1",
    "metadata": {
     "papermill": {
-     "duration": 0.002833,
-     "end_time": "2026-02-22T08:11:07.197603",
+     "duration": 0.002916,
+     "end_time": "2026-02-22T09:01:39.074780",
      "exception": false,
-     "start_time": "2026-02-22T08:11:07.194770",
+     "start_time": "2026-02-22T09:01:39.071864",
      "status": "completed"
     },
     "tags": []
@@ -19,13 +19,13 @@
   },
   {
    "cell_type": "markdown",
-   "id": "56bb6511",
+   "id": "26757288",
    "metadata": {
     "papermill": {
-     "duration": 0.001845,
-     "end_time": "2026-02-22T08:11:07.201506",
+     "duration": 0.00184,
+     "end_time": "2026-02-22T09:01:39.078698",
      "exception": false,
-     "start_time": "2026-02-22T08:11:07.199661",
+     "start_time": "2026-02-22T09:01:39.076858",
      "status": "completed"
     },
     "tags": []
@@ -37,25 +37,25 @@
   {
    "cell_type": "code",
    "execution_count": 1,
-   "id": "d0ca5a66",
+   "id": "38785f85",
    "metadata": {
     "_cell_guid": "b1076dfc-b9ad-4769-8c92-a6c4dae69d19",
     "_uuid": "8f2839f25d086af736a60e9eeb907d3b93b6e0e5",
     "collapsed": true,
     "execution": {
-     "iopub.execute_input": "2026-02-22T08:11:07.206473Z",
-     "iopub.status.busy": "2026-02-22T08:11:07.206190Z",
-     "iopub.status.idle": "2026-02-22T08:11:33.136587Z",
-     "shell.execute_reply": "2026-02-22T08:11:33.135885Z"
+     "iopub.execute_input": "2026-02-22T09:01:39.084559Z",
+     "iopub.status.busy": "2026-02-22T09:01:39.083959Z",
+     "iopub.status.idle": "2026-02-22T09:01:57.486554Z",
+     "shell.execute_reply": "2026-02-22T09:01:57.485680Z"
     },
     "jupyter": {
      "outputs_hidden": true
     },
     "papermill": {
-     "duration": 25.934862,
-     "end_time": "2026-02-22T08:11:33.138159",
+     "duration": 18.407509,
+     "end_time": "2026-02-22T09:01:57.488256",
      "exception": false,
-     "start_time": "2026-02-22T08:11:07.203297",
+     "start_time": "2026-02-22T09:01:39.080747",
      "status": "completed"
     },
     "tags": []
@@ -69,14 +69,14 @@
       "  warnings.warn(\n",
       "/usr/local/lib/python3.12/dist-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The 'frozen' attribute with value True was provided to the `Field()` function, which has no effect in the context it was used. 'frozen' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.\n",
       "  warnings.warn(\n",
-      "2026-02-22 08:11:17.070039: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:467] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\n",
+      "2026-02-22 09:01:45.419706: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:467] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\n",
       "WARNING: All log messages before absl::InitializeLog() is called are written to STDERR\n",
-      "E0000 00:00:1771747877.390033      24 cuda_dnn.cc:8579] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered\n",
-      "E0000 00:00:1771747877.486824      24 cuda_blas.cc:1407] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered\n",
-      "W0000 00:00:1771747878.306445      24 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
-      "W0000 00:00:1771747878.306489      24 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
-      "W0000 00:00:1771747878.306492      24 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
-      "W0000 00:00:1771747878.306495      24 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
+      "E0000 00:00:1771750905.602210      24 cuda_dnn.cc:8579] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered\n",
+      "E0000 00:00:1771750905.654463      24 cuda_blas.cc:1407] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered\n",
+      "W0000 00:00:1771750906.105840      24 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
+      "W0000 00:00:1771750906.105910      24 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
+      "W0000 00:00:1771750906.105914      24 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
+      "W0000 00:00:1771750906.105916      24 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
       "\u001b[34m\u001b[1mwandb\u001b[0m: \u001b[33mWARNING\u001b[0m If you're specifying your api key in code, ensure this code is not shared publicly.\n",
       "\u001b[34m\u001b[1mwandb\u001b[0m: \u001b[33mWARNING\u001b[0m Consider setting the WANDB_API_KEY environment variable, or running `wandb login` from the command line.\n"
      ]
@@ -95,6 +95,7 @@
     "import tensorflow as tf\n",
     "from tensorflow.keras import models, layers\n",
     "from tensorflow.keras.callbacks import ReduceLROnPlateau, EarlyStopping\n",
+    "from tensorflow.keras.applications import ResNet50\n",
     "from kaggle_secrets import UserSecretsClient\n",
     "\n",
     "warnings.filterwarnings('ignore')\n",
@@ -114,13 +115,13 @@
   },
   {
    "cell_type": "markdown",
-   "id": "003abccd",
+   "id": "22e67dab",
    "metadata": {
     "papermill": {
-     "duration": 0.002036,
-     "end_time": "2026-02-22T08:11:33.142442",
+     "duration": 0.002148,
+     "end_time": "2026-02-22T09:01:57.492685",
      "exception": false,
-     "start_time": "2026-02-22T08:11:33.140406",
+     "start_time": "2026-02-22T09:01:57.490537",
      "status": "completed"
     },
     "tags": []
@@ -132,23 +133,23 @@
   {
    "cell_type": "code",
    "execution_count": 2,
-   "id": "1e16b139",
+   "id": "6635c031",
    "metadata": {
     "collapsed": true,
     "execution": {
-     "iopub.execute_input": "2026-02-22T08:11:33.148089Z",
-     "iopub.status.busy": "2026-02-22T08:11:33.147226Z",
-     "iopub.status.idle": "2026-02-22T08:11:33.152251Z",
-     "shell.execute_reply": "2026-02-22T08:11:33.151694Z"
+     "iopub.execute_input": "2026-02-22T09:01:57.498739Z",
+     "iopub.status.busy": "2026-02-22T09:01:57.497821Z",
+     "iopub.status.idle": "2026-02-22T09:01:57.503196Z",
+     "shell.execute_reply": "2026-02-22T09:01:57.502558Z"
     },
     "jupyter": {
      "outputs_hidden": true
     },
     "papermill": {
-     "duration": 0.009057,
-     "end_time": "2026-02-22T08:11:33.153489",
+     "duration": 0.009916,
+     "end_time": "2026-02-22T09:01:57.504602",
      "exception": false,
-     "start_time": "2026-02-22T08:11:33.144432",
+     "start_time": "2026-02-22T09:01:57.494686",
      "status": "completed"
     },
     "tags": []
@@ -173,13 +174,13 @@
   },
   {
    "cell_type": "markdown",
-   "id": "6594c58d",
+   "id": "cb91d6aa",
    "metadata": {
     "papermill": {
-     "duration": 0.002093,
-     "end_time": "2026-02-22T08:11:33.157638",
+     "duration": 0.002098,
+     "end_time": "2026-02-22T09:01:57.508761",
      "exception": false,
-     "start_time": "2026-02-22T08:11:33.155545",
+     "start_time": "2026-02-22T09:01:57.506663",
      "status": "completed"
     },
     "tags": []
@@ -191,23 +192,23 @@
   {
    "cell_type": "code",
    "execution_count": 3,
-   "id": "5aee098b",
+   "id": "6e7a5f55",
    "metadata": {
     "collapsed": true,
     "execution": {
-     "iopub.execute_input": "2026-02-22T08:11:33.162734Z",
-     "iopub.status.busy": "2026-02-22T08:11:33.162497Z",
-     "iopub.status.idle": "2026-02-22T08:19:07.757230Z",
-     "shell.execute_reply": "2026-02-22T08:19:07.756470Z"
+     "iopub.execute_input": "2026-02-22T09:01:57.514341Z",
+     "iopub.status.busy": "2026-02-22T09:01:57.513838Z",
+     "iopub.status.idle": "2026-02-22T09:09:41.154874Z",
+     "shell.execute_reply": "2026-02-22T09:09:41.154056Z"
     },
     "jupyter": {
      "outputs_hidden": true
     },
     "papermill": {
-     "duration": 454.599417,
-     "end_time": "2026-02-22T08:19:07.759005",
+     "duration": 463.645825,
+     "end_time": "2026-02-22T09:09:41.156759",
      "exception": false,
-     "start_time": "2026-02-22T08:11:33.159588",
+     "start_time": "2026-02-22T09:01:57.510934",
      "status": "completed"
     },
     "tags": []
@@ -217,16 +218,16 @@
      "name": "stderr",
      "output_type": "stream",
      "text": [
-      "100%|██████████| 100/100 [01:00<00:00,  1.66it/s]\n",
-      "100%|██████████| 100/100 [00:46<00:00,  2.15it/s]\n",
-      "100%|██████████| 100/100 [00:45<00:00,  2.20it/s]\n",
+      "100%|██████████| 100/100 [00:58<00:00,  1.71it/s]\n",
+      "100%|██████████| 100/100 [00:46<00:00,  2.17it/s]\n",
+      "100%|██████████| 100/100 [00:44<00:00,  2.23it/s]\n",
+      "100%|██████████| 100/100 [00:45<00:00,  2.22it/s]\n",
+      "100%|██████████| 100/100 [00:47<00:00,  2.10it/s]\n",
+      "100%|██████████| 100/100 [00:41<00:00,  2.40it/s]\n",
+      "100%|██████████| 100/100 [00:45<00:00,  2.21it/s]\n",
+      "100%|██████████| 100/100 [00:45<00:00,  2.22it/s]\n",
       "100%|██████████| 100/100 [00:44<00:00,  2.24it/s]\n",
-      "100%|██████████| 100/100 [00:44<00:00,  2.24it/s]\n",
-      "100%|██████████| 100/100 [00:38<00:00,  2.60it/s]\n",
-      "100%|██████████| 100/100 [00:42<00:00,  2.34it/s]\n",
-      "100%|██████████| 100/100 [00:43<00:00,  2.30it/s]\n",
-      "100%|██████████| 100/100 [00:43<00:00,  2.28it/s]\n",
-      "100%|██████████| 100/100 [00:43<00:00,  2.28it/s]\n"
+      "100%|██████████| 100/100 [00:44<00:00,  2.25it/s]\n"
      ]
     }
    ],
@@ -279,17 +280,18 @@
     "            if mixed_y is not None:\n",
     "                img = get_spectrogram(mixed_y, sr_val)\n",
     "                if img is not None:\n",
-    "                    X_images.append(img)\n",
+    "                    img_3c = np.stack((img,)*3, axis=-1)\n",
+    "                    X_images.append(img_3c)\n",
     "                    y_labels.append(genre)\n",
     "\n",
-    "X = np.array(X_images)[..., np.newaxis] \n",
+    "X = np.array(X_images)\n",
     "y_target = np.array(y_labels)"
    ]
   },
   {
    "attachments": {},
    "cell_type": "raw",
-   "id": "1171ff35",
+   "id": "d0d54cc8",
    "metadata": {
     "execution": {
      "iopub.execute_input": "2026-02-19T11:56:22.390780Z",
@@ -299,10 +301,10 @@
      "shell.execute_reply.started": "2026-02-19T11:56:22.390761Z"
     },
     "papermill": {
-     "duration": 0.035833,
-     "end_time": "2026-02-22T08:19:07.830984",
+     "duration": 0.036497,
+     "end_time": "2026-02-22T09:09:41.231962",
      "exception": false,
-     "start_time": "2026-02-22T08:19:07.795151",
+     "start_time": "2026-02-22T09:09:41.195465",
      "status": "completed"
     },
     "tags": []
@@ -311,41 +313,41 @@
   },
   {
    "cell_type": "markdown",
-   "id": "b6e2ed8e",
+   "id": "658e5b62",
    "metadata": {
     "papermill": {
-     "duration": 0.035348,
-     "end_time": "2026-02-22T08:19:07.901717",
+     "duration": 0.038168,
+     "end_time": "2026-02-22T09:09:41.307336",
      "exception": false,
-     "start_time": "2026-02-22T08:19:07.866369",
+     "start_time": "2026-02-22T09:09:41.269168",
      "status": "completed"
     },
     "tags": []
    },
    "source": [
-    "# Model Architecture & Training Pipeline (SpecAugment)"
+    "# Model Architecture & Training Pipeline (Transfer Learning with ResNet50)"
    ]
   },
   {
    "cell_type": "code",
    "execution_count": 4,
-   "id": "13f5d840",
+   "id": "780853c8",
    "metadata": {
     "collapsed": true,
     "execution": {
-     "iopub.execute_input": "2026-02-22T08:19:07.974616Z",
-     "iopub.status.busy": "2026-02-22T08:19:07.974014Z",
-     "iopub.status.idle": "2026-02-22T08:22:17.595356Z",
-     "shell.execute_reply": "2026-02-22T08:22:17.594612Z"
+     "iopub.execute_input": "2026-02-22T09:09:41.383444Z",
+     "iopub.status.busy": "2026-02-22T09:09:41.382615Z",
+     "iopub.status.idle": "2026-02-22T09:17:12.425912Z",
+     "shell.execute_reply": "2026-02-22T09:17:12.425140Z"
     },
     "jupyter": {
      "outputs_hidden": true
     },
     "papermill": {
-     "duration": 189.659633,
-     "end_time": "2026-02-22T08:22:17.596959",
+     "duration": 451.083875,
+     "end_time": "2026-02-22T09:17:12.427422",
      "exception": false,
-     "start_time": "2026-02-22T08:19:07.937326",
+     "start_time": "2026-02-22T09:09:41.343547",
      "status": "completed"
     },
     "tags": []
@@ -356,20 +358,22 @@
      "output_type": "stream",
      "text": [
       "\u001b[34m\u001b[1mwandb\u001b[0m: W&B API key is configured. Use \u001b[1m`wandb login --relogin`\u001b[0m to force relogin\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: setting up run afx18vtd\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: setting up run 3gem2ylp\n",
       "\u001b[34m\u001b[1mwandb\u001b[0m: Tracking run with wandb version 0.22.2\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: Run data is saved locally in \u001b[35m\u001b[1m/kaggle/working/wandb/run-20260222_081908-afx18vtd\u001b[0m\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: Run data is saved locally in \u001b[35m\u001b[1m/kaggle/working/wandb/run-20260222_090941-3gem2ylp\u001b[0m\n",
       "\u001b[34m\u001b[1mwandb\u001b[0m: Run \u001b[1m`wandb offline`\u001b[0m to turn off syncing.\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: Syncing run \u001b[33mVGG with SpecAugment\u001b[0m\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: Syncing run \u001b[33mTransfer Learning ResNet50 Phase\u001b[0m\n",
       "\u001b[34m\u001b[1mwandb\u001b[0m: ⭐️ View project at \u001b[34m\u001b[4mhttps://wandb.ai/choprayuvraj-iit-madras/24f2002642-t12026\u001b[0m\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: 🚀 View run at \u001b[34m\u001b[4mhttps://wandb.ai/choprayuvraj-iit-madras/24f2002642-t12026/runs/afx18vtd\u001b[0m\n",
-      "I0000 00:00:1771748353.991581      24 gpu_device.cc:2019] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 15511 MB memory:  -> device: 0, name: Tesla P100-PCIE-16GB, pci bus id: 0000:00:04.0, compute capability: 6.0\n"
+      "\u001b[34m\u001b[1mwandb\u001b[0m: 🚀 View run at \u001b[34m\u001b[4mhttps://wandb.ai/choprayuvraj-iit-madras/24f2002642-t12026/runs/3gem2ylp\u001b[0m\n",
+      "I0000 00:00:1771751385.794648      24 gpu_device.cc:2019] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 15511 MB memory:  -> device: 0, name: Tesla P100-PCIE-16GB, pci bus id: 0000:00:04.0, compute capability: 6.0\n"
      ]
     },
     {
      "name": "stdout",
      "output_type": "stream",
      "text": [
+      "Downloading data from https://storage.googleapis.com/tensorflow/keras-applications/resnet/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5\n",
+      "\u001b[1m94765736/94765736\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 0us/step\n",
       "Epoch 1/50\n"
      ]
     },
@@ -378,122 +382,85 @@
      "output_type": "stream",
      "text": [
       "WARNING: All log messages before absl::InitializeLog() is called are written to STDERR\n",
-      "I0000 00:00:1771748361.437054      99 service.cc:152] XLA service 0x79b1f4002380 initialized for platform CUDA (this does not guarantee that XLA will be used). Devices:\n",
-      "I0000 00:00:1771748361.437113      99 service.cc:160]   StreamExecutor device (0): Tesla P100-PCIE-16GB, Compute Capability 6.0\n",
-      "I0000 00:00:1771748362.353637      99 cuda_dnn.cc:529] Loaded cuDNN version 91002\n"
+      "I0000 00:00:1771751424.206041     100 service.cc:152] XLA service 0xa9647af0 initialized for platform CUDA (this does not guarantee that XLA will be used). Devices:\n",
+      "I0000 00:00:1771751424.206092     100 service.cc:160]   StreamExecutor device (0): Tesla P100-PCIE-16GB, Compute Capability 6.0\n",
+      "I0000 00:00:1771751429.741252     100 cuda_dnn.cc:529] Loaded cuDNN version 91002\n",
+      "I0000 00:00:1771751454.346440     100 device_compiler.h:188] Compiled cluster using XLA!  This line is logged at most once for the lifetime of the process.\n"
      ]
     },
     {
      "name": "stdout",
      "output_type": "stream",
      "text": [
-      "\u001b[1m 2/50\u001b[0m \u001b[37m━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[1m3s\u001b[0m 80ms/step - accuracy: 0.1250 - loss: 3.0430  "
-     ]
-    },
-    {
-     "name": "stderr",
-     "output_type": "stream",
-     "text": [
-      "I0000 00:00:1771748374.779316      99 device_compiler.h:188] Compiled cluster using XLA!  This line is logged at most once for the lifetime of the process.\n"
-     ]
-    },
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m26s\u001b[0m 166ms/step - accuracy: 0.2391 - loss: 2.2395 - val_accuracy: 0.1500 - val_loss: 3.4584 - learning_rate: 0.0010\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m82s\u001b[0m 413ms/step - accuracy: 0.2633 - loss: 2.5860 - val_accuracy: 0.3100 - val_loss: 2.2097 - learning_rate: 1.0000e-04\n",
       "Epoch 2/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 80ms/step - accuracy: 0.3864 - loss: 1.6998 - val_accuracy: 0.2400 - val_loss: 2.9423 - learning_rate: 0.0010\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m13s\u001b[0m 254ms/step - accuracy: 0.5776 - loss: 1.3391 - val_accuracy: 0.2200 - val_loss: 2.3801 - learning_rate: 1.0000e-04\n",
       "Epoch 3/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 80ms/step - accuracy: 0.3650 - loss: 1.6798 - val_accuracy: 0.1600 - val_loss: 4.5537 - learning_rate: 0.0010\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m13s\u001b[0m 257ms/step - accuracy: 0.6452 - loss: 1.2153 - val_accuracy: 0.3400 - val_loss: 2.5557 - learning_rate: 1.0000e-04\n",
       "Epoch 4/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 80ms/step - accuracy: 0.4919 - loss: 1.4225 - val_accuracy: 0.1500 - val_loss: 5.1913 - learning_rate: 0.0010\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 235ms/step - accuracy: 0.7659 - loss: 0.7513\n",
+      "Epoch 4: ReduceLROnPlateau reducing learning rate to 4.999999873689376e-05.\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m13s\u001b[0m 254ms/step - accuracy: 0.7658 - loss: 0.7514 - val_accuracy: 0.3250 - val_loss: 2.9104 - learning_rate: 1.0000e-04\n",
       "Epoch 5/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 74ms/step - accuracy: 0.4421 - loss: 1.4708\n",
-      "Epoch 5: ReduceLROnPlateau reducing learning rate to 0.0005000000237487257.\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 80ms/step - accuracy: 0.4427 - loss: 1.4704 - val_accuracy: 0.1200 - val_loss: 9.1189 - learning_rate: 0.0010\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m13s\u001b[0m 257ms/step - accuracy: 0.7692 - loss: 0.7013 - val_accuracy: 0.3650 - val_loss: 2.5531 - learning_rate: 5.0000e-05\n",
       "Epoch 6/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 80ms/step - accuracy: 0.5416 - loss: 1.2248 - val_accuracy: 0.3300 - val_loss: 1.9588 - learning_rate: 5.0000e-04\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m13s\u001b[0m 256ms/step - accuracy: 0.8471 - loss: 0.4694 - val_accuracy: 0.5300 - val_loss: 1.6129 - learning_rate: 5.0000e-05\n",
       "Epoch 7/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 81ms/step - accuracy: 0.5342 - loss: 1.2702 - val_accuracy: 0.3650 - val_loss: 1.8477 - learning_rate: 5.0000e-04\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m13s\u001b[0m 257ms/step - accuracy: 0.8695 - loss: 0.4195 - val_accuracy: 0.5850 - val_loss: 1.2281 - learning_rate: 5.0000e-05\n",
       "Epoch 8/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 81ms/step - accuracy: 0.5791 - loss: 1.1536 - val_accuracy: 0.6150 - val_loss: 1.1059 - learning_rate: 5.0000e-04\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m13s\u001b[0m 254ms/step - accuracy: 0.8697 - loss: 0.3983 - val_accuracy: 0.5500 - val_loss: 1.4807 - learning_rate: 5.0000e-05\n",
       "Epoch 9/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 81ms/step - accuracy: 0.5829 - loss: 1.2266 - val_accuracy: 0.4850 - val_loss: 1.4068 - learning_rate: 5.0000e-04\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m13s\u001b[0m 256ms/step - accuracy: 0.8804 - loss: 0.3412 - val_accuracy: 0.6000 - val_loss: 1.2320 - learning_rate: 5.0000e-05\n",
       "Epoch 10/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 81ms/step - accuracy: 0.6294 - loss: 1.0598 - val_accuracy: 0.5250 - val_loss: 1.3757 - learning_rate: 5.0000e-04\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m13s\u001b[0m 258ms/step - accuracy: 0.8925 - loss: 0.3119 - val_accuracy: 0.6550 - val_loss: 1.1530 - learning_rate: 5.0000e-05\n",
       "Epoch 11/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 75ms/step - accuracy: 0.6592 - loss: 1.0149\n",
-      "Epoch 11: ReduceLROnPlateau reducing learning rate to 0.0002500000118743628.\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 81ms/step - accuracy: 0.6589 - loss: 1.0152 - val_accuracy: 0.4050 - val_loss: 2.4274 - learning_rate: 5.0000e-04\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m13s\u001b[0m 255ms/step - accuracy: 0.9208 - loss: 0.2047 - val_accuracy: 0.7250 - val_loss: 0.9912 - learning_rate: 5.0000e-05\n",
       "Epoch 12/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 81ms/step - accuracy: 0.6586 - loss: 0.9411 - val_accuracy: 0.5600 - val_loss: 1.3063 - learning_rate: 2.5000e-04\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m13s\u001b[0m 253ms/step - accuracy: 0.9433 - loss: 0.1844 - val_accuracy: 0.6950 - val_loss: 1.0414 - learning_rate: 5.0000e-05\n",
       "Epoch 13/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 81ms/step - accuracy: 0.7099 - loss: 0.8732 - val_accuracy: 0.4400 - val_loss: 2.1126 - learning_rate: 2.5000e-04\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m13s\u001b[0m 256ms/step - accuracy: 0.9589 - loss: 0.1551 - val_accuracy: 0.8050 - val_loss: 0.6862 - learning_rate: 5.0000e-05\n",
       "Epoch 14/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 75ms/step - accuracy: 0.6954 - loss: 0.9379\n",
-      "Epoch 14: ReduceLROnPlateau reducing learning rate to 0.0001250000059371814.\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 81ms/step - accuracy: 0.6954 - loss: 0.9370 - val_accuracy: 0.6250 - val_loss: 1.1494 - learning_rate: 2.5000e-04\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m13s\u001b[0m 256ms/step - accuracy: 0.9528 - loss: 0.1382 - val_accuracy: 0.8250 - val_loss: 0.7213 - learning_rate: 5.0000e-05\n",
       "Epoch 15/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 80ms/step - accuracy: 0.7278 - loss: 0.7858 - val_accuracy: 0.6200 - val_loss: 1.1351 - learning_rate: 1.2500e-04\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m13s\u001b[0m 253ms/step - accuracy: 0.9588 - loss: 0.1279 - val_accuracy: 0.8050 - val_loss: 0.7988 - learning_rate: 5.0000e-05\n",
       "Epoch 16/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 81ms/step - accuracy: 0.7153 - loss: 0.8381 - val_accuracy: 0.6950 - val_loss: 0.9306 - learning_rate: 1.2500e-04\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 234ms/step - accuracy: 0.9613 - loss: 0.1052\n",
+      "Epoch 16: ReduceLROnPlateau reducing learning rate to 2.499999936844688e-05.\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m13s\u001b[0m 253ms/step - accuracy: 0.9615 - loss: 0.1052 - val_accuracy: 0.8150 - val_loss: 0.7304 - learning_rate: 5.0000e-05\n",
       "Epoch 17/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 81ms/step - accuracy: 0.7427 - loss: 0.7604 - val_accuracy: 0.7050 - val_loss: 0.9650 - learning_rate: 1.2500e-04\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m13s\u001b[0m 254ms/step - accuracy: 0.9643 - loss: 0.1210 - val_accuracy: 0.8200 - val_loss: 0.6833 - learning_rate: 2.5000e-05\n",
       "Epoch 18/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 81ms/step - accuracy: 0.7501 - loss: 0.7285 - val_accuracy: 0.6950 - val_loss: 0.9155 - learning_rate: 1.2500e-04\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m13s\u001b[0m 253ms/step - accuracy: 0.9703 - loss: 0.0975 - val_accuracy: 0.8250 - val_loss: 0.6304 - learning_rate: 2.5000e-05\n",
       "Epoch 19/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 81ms/step - accuracy: 0.7175 - loss: 0.8043 - val_accuracy: 0.6800 - val_loss: 1.0174 - learning_rate: 1.2500e-04\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m13s\u001b[0m 256ms/step - accuracy: 0.9741 - loss: 0.0627 - val_accuracy: 0.8400 - val_loss: 0.5664 - learning_rate: 2.5000e-05\n",
       "Epoch 20/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 81ms/step - accuracy: 0.7187 - loss: 0.7822 - val_accuracy: 0.6900 - val_loss: 0.9301 - learning_rate: 1.2500e-04\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m13s\u001b[0m 253ms/step - accuracy: 0.9808 - loss: 0.0660 - val_accuracy: 0.8350 - val_loss: 0.7118 - learning_rate: 2.5000e-05\n",
       "Epoch 21/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 75ms/step - accuracy: 0.7629 - loss: 0.7138\n",
-      "Epoch 21: ReduceLROnPlateau reducing learning rate to 6.25000029685907e-05.\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 81ms/step - accuracy: 0.7628 - loss: 0.7142 - val_accuracy: 0.6700 - val_loss: 1.0674 - learning_rate: 1.2500e-04\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m13s\u001b[0m 256ms/step - accuracy: 0.9817 - loss: 0.0663 - val_accuracy: 0.8650 - val_loss: 0.6525 - learning_rate: 2.5000e-05\n",
       "Epoch 22/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 80ms/step - accuracy: 0.7299 - loss: 0.7216 - val_accuracy: 0.7050 - val_loss: 0.9079 - learning_rate: 6.2500e-05\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 234ms/step - accuracy: 0.9823 - loss: 0.0764\n",
+      "Epoch 22: ReduceLROnPlateau reducing learning rate to 1.249999968422344e-05.\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m13s\u001b[0m 253ms/step - accuracy: 0.9824 - loss: 0.0762 - val_accuracy: 0.8600 - val_loss: 0.6672 - learning_rate: 2.5000e-05\n",
       "Epoch 23/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 80ms/step - accuracy: 0.7398 - loss: 0.7249 - val_accuracy: 0.7200 - val_loss: 0.9076 - learning_rate: 6.2500e-05\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m13s\u001b[0m 253ms/step - accuracy: 0.9853 - loss: 0.0590 - val_accuracy: 0.8600 - val_loss: 0.6307 - learning_rate: 1.2500e-05\n",
       "Epoch 24/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 80ms/step - accuracy: 0.7598 - loss: 0.7067 - val_accuracy: 0.6750 - val_loss: 0.9395 - learning_rate: 6.2500e-05\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m13s\u001b[0m 252ms/step - accuracy: 0.9731 - loss: 0.0727 - val_accuracy: 0.8500 - val_loss: 0.6003 - learning_rate: 1.2500e-05\n",
       "Epoch 25/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 80ms/step - accuracy: 0.7758 - loss: 0.6846 - val_accuracy: 0.7450 - val_loss: 0.8942 - learning_rate: 6.2500e-05\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 235ms/step - accuracy: 0.9897 - loss: 0.0430\n",
+      "Epoch 25: ReduceLROnPlateau reducing learning rate to 6.24999984211172e-06.\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m13s\u001b[0m 253ms/step - accuracy: 0.9897 - loss: 0.0430 - val_accuracy: 0.8650 - val_loss: 0.5928 - learning_rate: 1.2500e-05\n",
       "Epoch 26/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 80ms/step - accuracy: 0.7928 - loss: 0.6183 - val_accuracy: 0.6900 - val_loss: 1.0255 - learning_rate: 6.2500e-05\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m13s\u001b[0m 252ms/step - accuracy: 0.9953 - loss: 0.0397 - val_accuracy: 0.8650 - val_loss: 0.6111 - learning_rate: 6.2500e-06\n",
       "Epoch 27/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 80ms/step - accuracy: 0.7654 - loss: 0.6786 - val_accuracy: 0.7150 - val_loss: 0.9263 - learning_rate: 6.2500e-05\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m13s\u001b[0m 252ms/step - accuracy: 0.9817 - loss: 0.0719 - val_accuracy: 0.8650 - val_loss: 0.5942 - learning_rate: 6.2500e-06\n",
       "Epoch 28/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 74ms/step - accuracy: 0.7571 - loss: 0.7182\n",
-      "Epoch 28: ReduceLROnPlateau reducing learning rate to 3.125000148429535e-05.\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 80ms/step - accuracy: 0.7574 - loss: 0.7175 - val_accuracy: 0.6350 - val_loss: 1.1753 - learning_rate: 6.2500e-05\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 235ms/step - accuracy: 0.9905 - loss: 0.0411\n",
+      "Epoch 28: ReduceLROnPlateau reducing learning rate to 3.12499992105586e-06.\n",
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m13s\u001b[0m 254ms/step - accuracy: 0.9905 - loss: 0.0411 - val_accuracy: 0.8650 - val_loss: 0.6049 - learning_rate: 6.2500e-06\n",
       "Epoch 29/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 80ms/step - accuracy: 0.7543 - loss: 0.6947 - val_accuracy: 0.7600 - val_loss: 0.8554 - learning_rate: 3.1250e-05\n",
-      "Epoch 30/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 80ms/step - accuracy: 0.7445 - loss: 0.6799 - val_accuracy: 0.6950 - val_loss: 0.9701 - learning_rate: 3.1250e-05\n",
-      "Epoch 31/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 80ms/step - accuracy: 0.7496 - loss: 0.6979 - val_accuracy: 0.7650 - val_loss: 0.8201 - learning_rate: 3.1250e-05\n",
-      "Epoch 32/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 80ms/step - accuracy: 0.7461 - loss: 0.7134 - val_accuracy: 0.7550 - val_loss: 0.8440 - learning_rate: 3.1250e-05\n",
-      "Epoch 33/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 80ms/step - accuracy: 0.7733 - loss: 0.6312 - val_accuracy: 0.7300 - val_loss: 0.9095 - learning_rate: 3.1250e-05\n",
-      "Epoch 34/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 74ms/step - accuracy: 0.7657 - loss: 0.7386\n",
-      "Epoch 34: ReduceLROnPlateau reducing learning rate to 1.5625000742147677e-05.\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 80ms/step - accuracy: 0.7659 - loss: 0.7374 - val_accuracy: 0.7450 - val_loss: 0.8589 - learning_rate: 3.1250e-05\n",
-      "Epoch 35/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 80ms/step - accuracy: 0.7720 - loss: 0.6378 - val_accuracy: 0.7450 - val_loss: 0.8827 - learning_rate: 1.5625e-05\n",
-      "Epoch 36/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 80ms/step - accuracy: 0.8017 - loss: 0.6227 - val_accuracy: 0.7400 - val_loss: 0.8685 - learning_rate: 1.5625e-05\n",
-      "Epoch 37/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m0s\u001b[0m 74ms/step - accuracy: 0.8043 - loss: 0.5959\n",
-      "Epoch 37: ReduceLROnPlateau reducing learning rate to 7.812500371073838e-06.\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 80ms/step - accuracy: 0.8038 - loss: 0.5970 - val_accuracy: 0.7500 - val_loss: 0.8556 - learning_rate: 1.5625e-05\n",
-      "Epoch 38/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 80ms/step - accuracy: 0.7912 - loss: 0.6293 - val_accuracy: 0.7450 - val_loss: 0.8573 - learning_rate: 7.8125e-06\n",
-      "Epoch 39/50\n",
-      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 80ms/step - accuracy: 0.7742 - loss: 0.6964 - val_accuracy: 0.7450 - val_loss: 0.8630 - learning_rate: 7.8125e-06\n",
-      "Epoch 39: early stopping\n",
-      "Restoring model weights from the end of the best epoch: 31.\n"
+      "\u001b[1m50/50\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m13s\u001b[0m 253ms/step - accuracy: 0.9922 - loss: 0.0411 - val_accuracy: 0.8650 - val_loss: 0.6013 - learning_rate: 3.1250e-06\n",
+      "Epoch 29: early stopping\n",
+      "Restoring model weights from the end of the best epoch: 21.\n"
      ]
     },
     {
@@ -501,24 +468,23 @@
      "output_type": "stream",
      "text": [
       "\u001b[34m\u001b[1mwandb\u001b[0m: updating run metadata\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: uploading history steps 37-38, summary, console lines 95-99\n",
       "\u001b[34m\u001b[1mwandb\u001b[0m: \n",
       "\u001b[34m\u001b[1mwandb\u001b[0m: Run history:\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m:     accuracy ▁▂▃▃▄▅▅▅▆▆▆▆▆▇▇▇▇▇▇▇▇▇█▇▇▇██▇▇█████████\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m:         loss █▆▆▅▅▄▄▄▃▃▃▃▂▂▂▂▂▂▂▂▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: val_accuracy ▁▂▁▁▁▃▄▆▅▅▄▆▄▆▆▇▇▇▇▇▇▇█▇█▇▇▇█▇█████████\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m:     val_loss ▃▃▄▅█▂▂▁▁▁▂▁▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m:     accuracy ▁▄▄▅▆▆▇▇▇▇▇▇█████████████████\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m:         loss █▅▄▃▃▃▂▂▂▂▂▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: val_accuracy ▂▁▂▂▃▄▅▅▅▆▆▆▇█▇▇█████████████\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m:     val_loss ▆▆▇█▇▄▃▄▃▃▂▂▁▁▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁\n",
       "\u001b[34m\u001b[1mwandb\u001b[0m: \n",
       "\u001b[34m\u001b[1mwandb\u001b[0m: Run summary:\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m:     accuracy 0.77625\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m:         loss 0.65747\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: val_accuracy 0.745\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m:     val_loss 0.86303\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m:     accuracy 0.99375\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m:         loss 0.03938\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: val_accuracy 0.865\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m:     val_loss 0.60131\n",
       "\u001b[34m\u001b[1mwandb\u001b[0m: \n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: 🚀 View run \u001b[33mVGG with SpecAugment\u001b[0m at: \u001b[34m\u001b[4mhttps://wandb.ai/choprayuvraj-iit-madras/24f2002642-t12026/runs/afx18vtd\u001b[0m\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: 🚀 View run \u001b[33mTransfer Learning ResNet50 Phase\u001b[0m at: \u001b[34m\u001b[4mhttps://wandb.ai/choprayuvraj-iit-madras/24f2002642-t12026/runs/3gem2ylp\u001b[0m\n",
       "\u001b[34m\u001b[1mwandb\u001b[0m: ⭐️ View project at: \u001b[34m\u001b[4mhttps://wandb.ai/choprayuvraj-iit-madras/24f2002642-t12026\u001b[0m\n",
       "\u001b[34m\u001b[1mwandb\u001b[0m: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: Find logs at: \u001b[35m\u001b[1m./wandb/run-20260222_081908-afx18vtd/logs\u001b[0m\n"
+      "\u001b[34m\u001b[1mwandb\u001b[0m: Find logs at: \u001b[35m\u001b[1m./wandb/run-20260222_090941-3gem2ylp/logs\u001b[0m\n"
      ]
     }
    ],
@@ -526,7 +492,7 @@
     "run = wandb.init(\n",
     "    entity=\"choprayuvraj-iit-madras\",\n",
     "    project=\"24f2002642-t12026\",\n",
-    "    name=\"VGG with SpecAugment\",\n",
+    "    name=\"Transfer Learning ResNet50 Phase\",\n",
     "    job_type=\"train\"\n",
     ")\n",
     "\n",
@@ -560,37 +526,19 @@
     "\n",
     "val_dataset = tf.data.Dataset.from_tensor_slices((X_val, y_val)).batch(16).prefetch(tf.data.AUTOTUNE)\n",
     "\n",
+    "base_model = ResNet50(weights='imagenet', include_top=False, input_shape=(128, 1292, 3))\n",
+    "base_model.trainable = True \n",
+    "\n",
     "model = models.Sequential([\n",
-    "    layers.Input(shape=(128, 1292, 1)),\n",
-    "    \n",
-    "    layers.Conv2D(32, (3, 3), padding='same', activation='relu'),\n",
-    "    layers.BatchNormalization(),\n",
-    "    layers.Conv2D(32, (3, 3), padding='same', activation='relu'),\n",
-    "    layers.BatchNormalization(),\n",
-    "    layers.MaxPooling2D((2, 4)),\n",
-    "    layers.Dropout(0.25),\n",
-    "    \n",
-    "    layers.Conv2D(64, (3, 3), padding='same', activation='relu'),\n",
-    "    layers.BatchNormalization(),\n",
-    "    layers.Conv2D(64, (3, 3), padding='same', activation='relu'),\n",
-    "    layers.BatchNormalization(),\n",
-    "    layers.MaxPooling2D((2, 4)),\n",
-    "    layers.Dropout(0.25),\n",
-    "    \n",
-    "    layers.Conv2D(128, (3, 3), padding='same', activation='relu'),\n",
-    "    layers.BatchNormalization(),\n",
-    "    layers.Conv2D(128, (3, 3), padding='same', activation='relu'),\n",
-    "    layers.BatchNormalization(),\n",
-    "    layers.MaxPooling2D((2, 4)),\n",
-    "    layers.Dropout(0.25),\n",
-    "    \n",
+    "    base_model,\n",
     "    layers.GlobalAveragePooling2D(),\n",
     "    layers.Dense(256, activation='relu'),\n",
-    "    layers.Dropout(0.4),\n",
+    "    layers.BatchNormalization(),\n",
+    "    layers.Dropout(0.5),\n",
     "    layers.Dense(10, activation='softmax')\n",
     "])\n",
     "\n",
-    "optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)\n",
+    "optimizer = tf.keras.optimizers.Adam(learning_rate=0.0001) \n",
     "model.compile(optimizer=optimizer, loss='sparse_categorical_crossentropy', metrics=['accuracy'])\n",
     "\n",
     "class SimpleWandbCallback(tf.keras.callbacks.Callback):\n",
@@ -612,13 +560,13 @@
   },
   {
    "cell_type": "markdown",
-   "id": "fe0ae8a3",
+   "id": "1e6a3b74",
    "metadata": {
     "papermill": {
-     "duration": 0.194243,
-     "end_time": "2026-02-22T08:22:17.906924",
+     "duration": 0.09582,
+     "end_time": "2026-02-22T09:17:12.618655",
      "exception": false,
-     "start_time": "2026-02-22T08:22:17.712681",
+     "start_time": "2026-02-22T09:17:12.522835",
      "status": "completed"
     },
     "tags": []
@@ -630,24 +578,24 @@
   {
    "cell_type": "code",
    "execution_count": 5,
-   "id": "39b0a8bc",
+   "id": "464c1f9e",
    "metadata": {
     "_kg_hide-output": true,
     "collapsed": true,
     "execution": {
-     "iopub.execute_input": "2026-02-22T08:22:18.135809Z",
-     "iopub.status.busy": "2026-02-22T08:22:18.135261Z",
-     "iopub.status.idle": "2026-02-22T08:30:24.390292Z",
-     "shell.execute_reply": "2026-02-22T08:30:24.389514Z"
+     "iopub.execute_input": "2026-02-22T09:17:12.807218Z",
+     "iopub.status.busy": "2026-02-22T09:17:12.806473Z",
+     "iopub.status.idle": "2026-02-22T09:26:32.021759Z",
+     "shell.execute_reply": "2026-02-22T09:26:32.020967Z"
     },
     "jupyter": {
      "outputs_hidden": true
     },
     "papermill": {
-     "duration": 486.372113,
-     "end_time": "2026-02-22T08:30:24.391871",
+     "duration": 559.31127,
+     "end_time": "2026-02-22T09:26:32.023612",
      "exception": false,
-     "start_time": "2026-02-22T08:22:18.019758",
+     "start_time": "2026-02-22T09:17:12.712342",
      "status": "completed"
     },
     "tags": []
@@ -657,19 +605,19 @@
      "name": "stderr",
      "output_type": "stream",
      "text": [
-      "100%|██████████| 3020/3020 [08:06<00:00,  6.21it/s]"
+      "100%|██████████| 3020/3020 [09:19<00:00,  5.40it/s]"
      ]
     },
     {
      "name": "stdout",
      "output_type": "stream",
      "text": [
-      "   id   genre\n",
-      "0   1  hiphop\n",
-      "1   2   metal\n",
-      "2   3   disco\n",
-      "3   4   metal\n",
-      "4   5   blues\n"
+      "   id  genre\n",
+      "0   1    pop\n",
+      "1   2    pop\n",
+      "2   3  disco\n",
+      "3   4  metal\n",
+      "4   5    pop\n"
      ]
     },
     {
@@ -706,7 +654,8 @@
     "            img = get_spectrogram(audio_y, sr)\n",
     "            \n",
     "            if img is not None:\n",
-    "                img_input = img[np.newaxis, ..., np.newaxis] \n",
+    "                img_3c = np.stack((img,)*3, axis=-1)\n",
+    "                img_input = img_3c[np.newaxis, ...]\n",
     "                pred_probs = model.predict(img_input, verbose=0)\n",
     "                pred_num = np.argmax(pred_probs)\n",
     "                pred_label = label_encoder.inverse_transform([pred_num])[0]\n",
@@ -759,14 +708,14 @@
   },
   "papermill": {
    "default_parameters": {},
-   "duration": 1164.534682,
-   "end_time": "2026-02-22T08:30:28.330990",
+   "duration": 1499.1356,
+   "end_time": "2026-02-22T09:26:35.785605",
    "environment_variables": {},
    "exception": null,
    "input_path": "__notebook__.ipynb",
    "output_path": "__notebook__.ipynb",
    "parameters": {},
-   "start_time": "2026-02-22T08:11:03.796308",
+   "start_time": "2026-02-22T09:01:36.650005",
    "version": "2.6.0"
   }
  },
