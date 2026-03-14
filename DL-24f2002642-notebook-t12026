@@ -2,79 +2,79 @@
  "cells": [
   {
    "cell_type": "markdown",
-   "id": "48a4414b",
+   "id": "7272b2a1",
    "metadata": {
     "papermill": {
-     "duration": 0.002839,
-     "end_time": "2026-03-14T11:51:37.331889",
+     "duration": 0.00281,
+     "end_time": "2026-03-14T13:33:51.134862",
      "exception": false,
-     "start_time": "2026-03-14T11:51:37.329050",
+     "start_time": "2026-03-14T13:33:51.132052",
      "status": "completed"
     },
     "tags": []
    },
    "source": [
-    "# Classical ML Baseline"
+    "# CNN from ScratcH"
    ]
   },
   {
    "cell_type": "markdown",
-   "id": "c82d3930",
+   "id": "76a1a858",
    "metadata": {
     "papermill": {
-     "duration": 0.001758,
-     "end_time": "2026-03-14T11:51:37.335576",
+     "duration": 0.001826,
+     "end_time": "2026-03-14T13:33:51.138794",
      "exception": false,
-     "start_time": "2026-03-14T11:51:37.333818",
+     "start_time": "2026-03-14T13:33:51.136968",
      "status": "completed"
     },
     "tags": []
    },
    "source": [
-    "## 1. Install & Imports"
+    "## 1. Imports & Seeds"
    ]
   },
   {
    "cell_type": "code",
    "execution_count": 1,
-   "id": "0b4a44b0",
+   "id": "3a9f648e",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2026-03-14T11:51:37.341644Z",
-     "iopub.status.busy": "2026-03-14T11:51:37.341361Z",
-     "iopub.status.idle": "2026-03-14T11:51:42.395980Z",
-     "shell.execute_reply": "2026-03-14T11:51:42.395118Z"
+     "iopub.execute_input": "2026-03-14T13:33:51.144660Z",
+     "iopub.status.busy": "2026-03-14T13:33:51.143947Z",
+     "iopub.status.idle": "2026-03-14T13:33:55.429715Z",
+     "shell.execute_reply": "2026-03-14T13:33:55.428930Z"
     },
     "papermill": {
-     "duration": 5.059085,
-     "end_time": "2026-03-14T11:51:42.397716",
+     "duration": 4.291111,
+     "end_time": "2026-03-14T13:33:55.431829",
      "exception": false,
-     "start_time": "2026-03-14T11:51:37.338631",
+     "start_time": "2026-03-14T13:33:51.140718",
      "status": "completed"
     },
     "tags": []
    },
    "outputs": [],
    "source": [
-    "!pip install -q lightgbm wandb"
+    "!pip install -q torchaudio torchmetrics wandb"
    ]
   },
   {
    "cell_type": "code",
    "execution_count": 2,
-   "id": "da247bf0",
+   "id": "54ddafb6",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2026-03-14T11:51:42.403242Z",
-     "iopub.status.busy": "2026-03-14T11:51:42.402974Z",
-     "iopub.status.idle": "2026-03-14T11:51:55.243533Z",
-     "shell.execute_reply": "2026-03-14T11:51:55.242680Z"
+     "iopub.execute_input": "2026-03-14T13:33:55.437106Z",
+     "iopub.status.busy": "2026-03-14T13:33:55.436845Z",
+     "iopub.status.idle": "2026-03-14T13:34:14.596960Z",
+     "shell.execute_reply": "2026-03-14T13:34:14.595977Z"
     },
     "papermill": {
-     "duration": 12.845186,
-     "end_time": "2026-03-14T11:51:55.245046",
+     "duration": 19.164855,
+     "end_time": "2026-03-14T13:34:14.598754",
      "exception": false,
-     "start_time": "2026-03-14T11:51:42.399860",
+     "start_time": "2026-03-14T13:33:55.433899",
      "status": "completed"
     },
     "tags": []
@@ -91,6 +91,13 @@
       "\u001b[34m\u001b[1mwandb\u001b[0m: \u001b[33mWARNING\u001b[0m If you're specifying your api key in code, ensure this code is not shared publicly.\n",
       "\u001b[34m\u001b[1mwandb\u001b[0m: \u001b[33mWARNING\u001b[0m Consider setting the WANDB_API_KEY environment variable, or running `wandb login` from the command line.\n"
      ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "cuda\n"
+     ]
     }
    ],
    "source": [
@@ -99,62 +106,73 @@
     "import warnings\n",
     "import numpy as np\n",
     "import pandas as pd\n",
-    "import librosa\n",
-    "import lightgbm as lgb\n",
+    "import torch\n",
+    "import torch.nn as nn\n",
+    "import torch.nn.functional as F\n",
+    "import torchaudio\n",
+    "import torchaudio.transforms as AT\n",
+    "from torch.utils.data import Dataset, DataLoader\n",
+    "from torchmetrics.classification import MulticlassF1Score\n",
     "import wandb\n",
     "from tqdm import tqdm\n",
-    "from sklearn.preprocessing import LabelEncoder\n",
-    "from sklearn.model_selection import StratifiedKFold\n",
-    "from sklearn.metrics import f1_score\n",
     "from kaggle_secrets import UserSecretsClient\n",
     "\n",
     "warnings.filterwarnings('ignore')\n",
     "\n",
+    "def set_seed(seed=42):\n",
+    "    random.seed(seed)\n",
+    "    np.random.seed(seed)\n",
+    "    torch.manual_seed(seed)\n",
+    "    torch.cuda.manual_seed_all(seed)\n",
+    "    torch.backends.cudnn.deterministic = True\n",
+    "\n",
+    "set_seed(42)\n",
+    "DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'\n",
+    "\n",
     "try:\n",
     "    user_secrets = UserSecretsClient()\n",
-    "    api_key = user_secrets.get_secret(\"wandb_key\")\n",
-    "    os.environ[\"WANDB_API_KEY\"] = api_key\n",
-    "    wandb.login(key=api_key, relogin=True)\n",
+    "    wandb_key = user_secrets.get_secret(\"wandb_key\")\n",
+    "    os.environ[\"WANDB_API_KEY\"] = wandb_key\n",
+    "    wandb.login(key=wandb_key, relogin=True)\n",
     "except Exception:\n",
     "    pass\n",
     "\n",
-    "random.seed(42)\n",
-    "np.random.seed(42)"
+    "print(DEVICE)"
    ]
   },
   {
    "cell_type": "markdown",
-   "id": "42c26682",
+   "id": "0581d314",
    "metadata": {
     "papermill": {
-     "duration": 0.001939,
-     "end_time": "2026-03-14T11:51:55.249222",
+     "duration": 0.00233,
+     "end_time": "2026-03-14T13:34:14.604480",
      "exception": false,
-     "start_time": "2026-03-14T11:51:55.247283",
+     "start_time": "2026-03-14T13:34:14.602150",
      "status": "completed"
     },
     "tags": []
    },
    "source": [
-    "## 2. Config"
+    "## 2. Global Config & Data Caching"
    ]
   },
   {
    "cell_type": "code",
    "execution_count": 3,
-   "id": "8b60439a",
+   "id": "0c27d112",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2026-03-14T11:51:55.254152Z",
-     "iopub.status.busy": "2026-03-14T11:51:55.253921Z",
-     "iopub.status.idle": "2026-03-14T11:51:55.259878Z",
-     "shell.execute_reply": "2026-03-14T11:51:55.259174Z"
+     "iopub.execute_input": "2026-03-14T13:34:14.612819Z",
+     "iopub.status.busy": "2026-03-14T13:34:14.612589Z",
+     "iopub.status.idle": "2026-03-14T13:34:20.012246Z",
+     "shell.execute_reply": "2026-03-14T13:34:20.011366Z"
     },
     "papermill": {
-     "duration": 0.009951,
-     "end_time": "2026-03-14T11:51:55.261131",
+     "duration": 5.405767,
+     "end_time": "2026-03-14T13:34:20.013719",
      "exception": false,
-     "start_time": "2026-03-14T11:51:55.251180",
+     "start_time": "2026-03-14T13:34:14.607952",
      "status": "completed"
     },
     "tags": []
@@ -164,78 +182,104 @@
      "name": "stdout",
      "output_type": "stream",
      "text": [
-      "Config done\n"
+      "  blues: 100 songs\n",
+      "  classical: 100 songs\n",
+      "  country: 100 songs\n",
+      "  disco: 100 songs\n",
+      "  hiphop: 100 songs\n",
+      "  jazz: 100 songs\n",
+      "  metal: 100 songs\n",
+      "  pop: 100 songs\n",
+      "  reggae: 100 songs\n",
+      "  rock: 100 songs\n",
+      "\n",
+      "Device: cuda | SR: 22050 | Duration: 30s | Frames: 661500\n"
      ]
     }
    ],
    "source": [
-    "SAMPLE_RATE   = 22050\n",
-    "DURATION      = 10\n",
-    "MAX_LENGTH    = SAMPLE_RATE * DURATION\n",
+    "SR             = 22050\n",
+    "DURATION       = 30\n",
+    "TARGET_LENGTH  = SR * DURATION\n",
     "\n",
-    "N_MFCC        = 40\n",
-    "N_CHROMA      = 12\n",
-    "N_MELS        = 128\n",
+    "N_MELS         = 128\n",
+    "N_FFT          = 1024\n",
+    "HOP_LENGTH     = 512\n",
     "\n",
-    "SONGS_PER_GENRE = 80       \n",
-    "CLIPS_PER_SONG  = 3         \n",
+    "BATCH_SIZE     = 16\n",
+    "NUM_WORKERS    = 2\n",
+    "EPOCHS         = 12\n",
+    "LR             = 3e-4\n",
+    "WEIGHT_DECAY   = 1e-4\n",
+    "MIXUP_ALPHA    = 0.4\n",
+    "MIXUP_PROB     = 0.5\n",
+    "TRAIN_SIZE     = 4000\n",
     "\n",
-    "BASE_PATH     = '/kaggle/input/jan-2026-dl-gen-ai-project/messy_mashup'\n",
-    "GENRES_PATH   = os.path.join(BASE_PATH, 'genres_stems')\n",
-    "MASHUPS_PATH  = os.path.join(BASE_PATH, 'mashups')\n",
-    "STEMS         = ['drums.wav', 'vocals.wav', 'bass.wav', 'other.wav']\n",
+    "BASE_PATH    = '/kaggle/input/jan-2026-dl-gen-ai-project/messy_mashup'\n",
+    "GENRES_PATH  = os.path.join(BASE_PATH, 'genres_stems')\n",
+    "MASHUPS_PATH = os.path.join(BASE_PATH, 'mashups')\n",
+    "STEMS        = ['drums.wav', 'vocals.wav', 'bass.wav', 'other.wav']\n",
     "\n",
-    "GENRES    = ['blues', 'classical', 'country', 'disco', 'hiphop',\n",
-    "             'jazz', 'metal', 'pop', 'reggae', 'rock']\n",
-    "label2id  = {g: i for i, g in enumerate(GENRES)}\n",
-    "id2label  = {i: g for g, i in label2id.items()}\n",
+    "GENRES   = ['blues', 'classical', 'country', 'disco', 'hiphop',\n",
+    "            'jazz', 'metal', 'pop', 'reggae', 'rock']\n",
+    "label2id = {g: i for i, g in enumerate(GENRES)}\n",
+    "id2label = {i: g for g, i in label2id.items()}\n",
     "\n",
-    "print('Config done')"
+    "song_index = {}\n",
+    "for genre in GENRES:\n",
+    "    gp    = os.path.join(GENRES_PATH, genre)\n",
+    "    valid = []\n",
+    "    for d in sorted(os.listdir(gp)):\n",
+    "        dp = os.path.join(gp, d)\n",
+    "        if os.path.isdir(dp) and all(os.path.exists(os.path.join(dp, s)) for s in STEMS):\n",
+    "            valid.append(dp)\n",
+    "    song_index[genre] = valid\n",
+    "    print(f'  {genre}: {len(valid)} songs')\n",
+    "\n",
+    "train_index, val_index = {}, {}\n",
+    "for genre in GENRES:\n",
+    "    songs = song_index[genre][:]\n",
+    "    random.shuffle(songs)\n",
+    "    split = int(0.85 * len(songs))\n",
+    "    train_index[genre] = songs[:split]\n",
+    "    val_index[genre]   = songs[split:]\n",
+    "\n",
+    "print(f'\\nDevice: {DEVICE} | SR: {SR} | Duration: {DURATION}s | Frames: {TARGET_LENGTH}')"
    ]
   },
   {
    "cell_type": "markdown",
-   "id": "08c9eb35",
+   "id": "57431c65",
    "metadata": {
     "papermill": {
-     "duration": 0.001879,
-     "end_time": "2026-03-14T11:51:55.264961",
+     "duration": 0.002398,
+     "end_time": "2026-03-14T13:34:20.018780",
      "exception": false,
-     "start_time": "2026-03-14T11:51:55.263082",
+     "start_time": "2026-03-14T13:34:20.016382",
      "status": "completed"
     },
     "tags": []
    },
    "source": [
-    "## 3. Feature Extraction\n",
-    "\n",
-    "For each song I mix the 4 stems, take a random 10s crop, and extract:\n",
-    "- **MFCC** (40 coefficients × mean+std = 80 features) — captures timbre\n",
-    "- **Chroma** (12 × mean+std = 24) — captures pitch class distribution\n",
-    "- **Spectral contrast** (7 × mean+std = 14) — captures spectral peaks vs valleys\n",
-    "- **RMS energy** (mean+std = 2) — overall loudness\n",
-    "- **Zero crossing rate** (mean+std = 2) — noisiness / percussion\n",
-    "- **Spectral rolloff** (mean+std = 2) — brightness\n",
-    "\n",
-    "Total: **124 features per clip**"
+    "## 3. Dataset & DataLoaders"
    ]
   },
   {
    "cell_type": "code",
    "execution_count": 4,
-   "id": "2dcfe702",
+   "id": "33a1883d",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2026-03-14T11:51:55.269807Z",
-     "iopub.status.busy": "2026-03-14T11:51:55.269551Z",
-     "iopub.status.idle": "2026-03-14T11:52:08.292468Z",
-     "shell.execute_reply": "2026-03-14T11:52:08.291823Z"
+     "iopub.execute_input": "2026-03-14T13:34:20.024988Z",
+     "iopub.status.busy": "2026-03-14T13:34:20.024768Z",
+     "iopub.status.idle": "2026-03-14T13:34:20.035765Z",
+     "shell.execute_reply": "2026-03-14T13:34:20.034944Z"
     },
     "papermill": {
-     "duration": 13.027795,
-     "end_time": "2026-03-14T11:52:08.294660",
+     "duration": 0.016032,
+     "end_time": "2026-03-14T13:34:20.037228",
      "exception": false,
-     "start_time": "2026-03-14T11:51:55.266865",
+     "start_time": "2026-03-14T13:34:20.021196",
      "status": "completed"
     },
     "tags": []
@@ -245,95 +289,244 @@
      "name": "stdout",
      "output_type": "stream",
      "text": [
-      "Feature vector size: 124\n"
+      "Train: 4000 | Val: 150\n"
      ]
     }
    ],
    "source": [
-    "def load_and_mix(song_path):\n",
+    "def load_mix(song_path):\n",
     "    mixed = None\n",
     "    for stem in STEMS:\n",
-    "        path  = os.path.join(song_path, stem)\n",
-    "        audio, _ = librosa.load(path, sr=SAMPLE_RATE, mono=True)\n",
-    "        audio = audio.astype(np.float32)\n",
-    "        mixed = audio if mixed is None else mixed + audio\n",
-    "    mixed = mixed / (np.max(np.abs(mixed)) + 1e-6)\n",
-    "    return mixed\n",
+    "        wav, sr = torchaudio.load(os.path.join(song_path, stem))\n",
+    "        if wav.shape[0] > 1:\n",
+    "            wav = wav.mean(dim=0, keepdim=True)\n",
+    "        if sr != SR:\n",
+    "            wav = AT.Resample(sr, SR)(wav)\n",
+    "        arr   = wav.squeeze(0).numpy().astype(np.float32)\n",
+    "        mixed = arr if mixed is None else mixed + arr\n",
+    "    peak = np.max(np.abs(mixed)) + 1e-6\n",
+    "    return mixed / peak\n",
     "\n",
     "\n",
-    "def random_crop(audio):\n",
-    "    if len(audio) >= MAX_LENGTH:\n",
-    "        start = random.randint(0, len(audio) - MAX_LENGTH)\n",
-    "        return audio[start: start + MAX_LENGTH]\n",
-    "    return np.pad(audio, (0, MAX_LENGTH - len(audio)))\n",
+    "def crop_random(audio):\n",
+    "    if len(audio) >= TARGET_LENGTH:\n",
+    "        start = random.randint(0, len(audio) - TARGET_LENGTH)\n",
+    "        return audio[start: start + TARGET_LENGTH]\n",
+    "    return np.pad(audio, (0, TARGET_LENGTH - len(audio)))\n",
     "\n",
     "\n",
-    "def extract_features(audio, sr=SAMPLE_RATE):\n",
-    "    feats = []\n",
-    "\n",
-    "    mfcc = librosa.feature.mfcc(y=audio, sr=sr, n_mfcc=N_MFCC)\n",
-    "    feats.extend(mfcc.mean(axis=1).tolist())\n",
-    "    feats.extend(mfcc.std(axis=1).tolist())\n",
-    "\n",
-    "    chroma = librosa.feature.chroma_stft(y=audio, sr=sr, n_chroma=N_CHROMA)\n",
-    "    feats.extend(chroma.mean(axis=1).tolist())\n",
-    "    feats.extend(chroma.std(axis=1).tolist())\n",
-    "\n",
-    "    contrast = librosa.feature.spectral_contrast(y=audio, sr=sr)\n",
-    "    feats.extend(contrast.mean(axis=1).tolist())\n",
-    "    feats.extend(contrast.std(axis=1).tolist())\n",
-    "\n",
-    "    rms = librosa.feature.rms(y=audio)\n",
-    "    feats.append(float(rms.mean()))\n",
-    "    feats.append(float(rms.std()))\n",
-    "\n",
-    "    zcr = librosa.feature.zero_crossing_rate(y=audio)\n",
-    "    feats.append(float(zcr.mean()))\n",
-    "    feats.append(float(zcr.std()))\n",
-    "\n",
-    "    rolloff = librosa.feature.spectral_rolloff(y=audio, sr=sr)\n",
-    "    feats.append(float(rolloff.mean()))\n",
-    "    feats.append(float(rolloff.std()))\n",
-    "\n",
-    "    return np.array(feats, dtype=np.float32)\n",
+    "def crop_center(audio):\n",
+    "    if len(audio) >= TARGET_LENGTH:\n",
+    "        start = (len(audio) - TARGET_LENGTH) // 2\n",
+    "        return audio[start: start + TARGET_LENGTH]\n",
+    "    return np.pad(audio, (0, TARGET_LENGTH - len(audio)))\n",
     "\n",
     "\n",
-    "print(f'Feature vector size: {len(extract_features(np.zeros(MAX_LENGTH)))}')"
+    "class TrainDataset(Dataset):\n",
+    "    def __init__(self, index, size=TRAIN_SIZE):\n",
+    "        self.index = index\n",
+    "        self.size  = size\n",
+    "\n",
+    "    def __len__(self):\n",
+    "        return self.size\n",
+    "\n",
+    "    def __getitem__(self, _):\n",
+    "        while True:\n",
+    "            try:\n",
+    "                genre     = random.choice(GENRES)\n",
+    "                song_path = random.choice(self.index[genre])\n",
+    "                audio     = load_mix(song_path)\n",
+    "                audio     = crop_random(audio)\n",
+    "                return (torch.tensor(audio).unsqueeze(0),\n",
+    "                        torch.tensor(label2id[genre], dtype=torch.long))\n",
+    "            except Exception:\n",
+    "                continue\n",
+    "\n",
+    "\n",
+    "class ValDataset(Dataset):\n",
+    "    def __init__(self, index):\n",
+    "        self.samples = [(g, sp) for g in GENRES for sp in index[g]]\n",
+    "\n",
+    "    def __len__(self):\n",
+    "        return len(self.samples)\n",
+    "\n",
+    "    def __getitem__(self, idx):\n",
+    "        genre, song_path = self.samples[idx]\n",
+    "        audio = load_mix(song_path)\n",
+    "        audio = crop_center(audio)\n",
+    "        return (torch.tensor(audio).unsqueeze(0),\n",
+    "                torch.tensor(label2id[genre], dtype=torch.long))\n",
+    "\n",
+    "\n",
+    "train_ds = TrainDataset(train_index)\n",
+    "val_ds   = ValDataset(val_index)\n",
+    "\n",
+    "train_loader = DataLoader(train_ds, batch_size=BATCH_SIZE, shuffle=True,\n",
+    "                          num_workers=NUM_WORKERS, pin_memory=True,\n",
+    "                          persistent_workers=True)\n",
+    "val_loader   = DataLoader(val_ds, batch_size=BATCH_SIZE, shuffle=False,\n",
+    "                          num_workers=NUM_WORKERS, pin_memory=True,\n",
+    "                          persistent_workers=True)\n",
+    "\n",
+    "print(f'Train: {len(train_ds)} | Val: {len(val_ds)}')"
    ]
   },
   {
    "cell_type": "markdown",
-   "id": "ab747f34",
+   "id": "f86b4ce6",
    "metadata": {
     "papermill": {
-     "duration": 0.003315,
-     "end_time": "2026-03-14T11:52:08.301856",
+     "duration": 0.002383,
+     "end_time": "2026-03-14T13:34:20.042017",
      "exception": false,
-     "start_time": "2026-03-14T11:52:08.298541",
+     "start_time": "2026-03-14T13:34:20.039634",
      "status": "completed"
     },
     "tags": []
    },
    "source": [
-    "## 4. Build Training Features"
+    "## 4. Model Architecture"
    ]
   },
   {
    "cell_type": "code",
    "execution_count": 5,
-   "id": "226fa7f0",
+   "id": "7cc1c38d",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2026-03-14T11:52:08.310497Z",
-     "iopub.status.busy": "2026-03-14T11:52:08.309822Z",
-     "iopub.status.idle": "2026-03-14T12:00:55.750628Z",
-     "shell.execute_reply": "2026-03-14T12:00:55.749941Z"
+     "iopub.execute_input": "2026-03-14T13:34:20.047965Z",
+     "iopub.status.busy": "2026-03-14T13:34:20.047720Z",
+     "iopub.status.idle": "2026-03-14T13:34:20.292013Z",
+     "shell.execute_reply": "2026-03-14T13:34:20.291296Z"
     },
     "papermill": {
-     "duration": 527.448272,
-     "end_time": "2026-03-14T12:00:55.753331",
+     "duration": 0.249219,
+     "end_time": "2026-03-14T13:34:20.293608",
      "exception": false,
-     "start_time": "2026-03-14T11:52:08.305059",
+     "start_time": "2026-03-14T13:34:20.044389",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "MelCNN on cuda | Params: 5,014,250\n"
+     ]
+    }
+   ],
+   "source": [
+    "mel_transform = AT.MelSpectrogram(\n",
+    "    sample_rate=SR, n_fft=N_FFT, hop_length=HOP_LENGTH,\n",
+    "    n_mels=N_MELS, f_min=20, f_max=8000\n",
+    ").to(DEVICE)\n",
+    "\n",
+    "amp_to_db  = AT.AmplitudeToDB(top_db=80).to(DEVICE)\n",
+    "time_mask  = AT.TimeMasking(time_mask_param=80).to(DEVICE)\n",
+    "freq_mask  = AT.FrequencyMasking(freq_mask_param=30).to(DEVICE)\n",
+    "\n",
+    "\n",
+    "def to_mel(wav, augment=False):\n",
+    "    spec = mel_transform(wav)\n",
+    "    spec = amp_to_db(spec)\n",
+    "    if augment:\n",
+    "        spec = freq_mask(time_mask(spec))\n",
+    "    mu  = spec.mean(dim=(-2, -1), keepdim=True)\n",
+    "    std = spec.std(dim=(-2, -1), keepdim=True) + 1e-6\n",
+    "    return (spec - mu) / std\n",
+    "\n",
+    "\n",
+    "class ResBlock(nn.Module):\n",
+    "    def __init__(self, in_ch, out_ch, stride=1):\n",
+    "        super().__init__()\n",
+    "        self.conv = nn.Sequential(\n",
+    "            nn.Conv2d(in_ch, out_ch, 3, padding=1, stride=stride, bias=False),\n",
+    "            nn.BatchNorm2d(out_ch),\n",
+    "            nn.ReLU(inplace=True),\n",
+    "            nn.Conv2d(out_ch, out_ch, 3, padding=1, bias=False),\n",
+    "            nn.BatchNorm2d(out_ch),\n",
+    "        )\n",
+    "        self.skip = (\n",
+    "            nn.Sequential(\n",
+    "                nn.Conv2d(in_ch, out_ch, 1, stride=stride, bias=False),\n",
+    "                nn.BatchNorm2d(out_ch)\n",
+    "            ) if (in_ch != out_ch or stride != 1) else nn.Identity()\n",
+    "        )\n",
+    "\n",
+    "    def forward(self, x):\n",
+    "        return F.relu(self.conv(x) + self.skip(x))\n",
+    "\n",
+    "\n",
+    "class MelCNN(nn.Module):\n",
+    "    def __init__(self, num_classes=10):\n",
+    "        super().__init__()\n",
+    "        self.stem   = nn.Sequential(\n",
+    "            nn.Conv2d(1, 32, 3, padding=1, bias=False),\n",
+    "            nn.BatchNorm2d(32),\n",
+    "            nn.ReLU(inplace=True),\n",
+    "        )\n",
+    "        self.stage1 = nn.Sequential(ResBlock(32,  64),  nn.MaxPool2d(2))\n",
+    "        self.stage2 = nn.Sequential(ResBlock(64,  128), nn.MaxPool2d(2))\n",
+    "        self.stage3 = nn.Sequential(ResBlock(128, 256), nn.MaxPool2d(2))\n",
+    "        self.stage4 = nn.Sequential(ResBlock(256, 512), nn.MaxPool2d(2))\n",
+    "        self.gap    = nn.AdaptiveAvgPool2d(1)\n",
+    "        self.head   = nn.Sequential(\n",
+    "            nn.Flatten(),\n",
+    "            nn.Linear(512, 256),\n",
+    "            nn.ReLU(inplace=True),\n",
+    "            nn.Dropout(0.4),\n",
+    "            nn.Linear(256, num_classes)\n",
+    "        )\n",
+    "\n",
+    "    def forward(self, x):\n",
+    "        x = self.stem(x)\n",
+    "        x = self.stage1(x)\n",
+    "        x = self.stage2(x)\n",
+    "        x = self.stage3(x)\n",
+    "        x = self.stage4(x)\n",
+    "        x = self.gap(x)\n",
+    "        return self.head(x)\n",
+    "\n",
+    "\n",
+    "model = MelCNN(num_classes=len(GENRES)).to(DEVICE)\n",
+    "print(f'MelCNN on {DEVICE} | Params: {sum(p.numel() for p in model.parameters()):,}')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "87ca6e91",
+   "metadata": {
+    "papermill": {
+     "duration": 0.002572,
+     "end_time": "2026-03-14T13:34:20.299044",
+     "exception": false,
+     "start_time": "2026-03-14T13:34:20.296472",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "## 5. Training Loop"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "id": "aff30fe8",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-03-14T13:34:20.305779Z",
+     "iopub.status.busy": "2026-03-14T13:34:20.305186Z",
+     "iopub.status.idle": "2026-03-14T16:09:12.383358Z",
+     "shell.execute_reply": "2026-03-14T16:09:12.382280Z"
+    },
+    "papermill": {
+     "duration": 9292.08348,
+     "end_time": "2026-03-14T16:09:12.385178",
+     "exception": false,
+     "start_time": "2026-03-14T13:34:20.301698",
      "status": "completed"
     },
     "tags": []
@@ -343,24 +536,406 @@
      "name": "stderr",
      "output_type": "stream",
      "text": [
-      "blues: 100%|██████████| 80/80 [00:54<00:00,  1.47it/s]\n",
-      "classical: 100%|██████████| 80/80 [00:49<00:00,  1.62it/s]\n",
-      "country: 100%|██████████| 80/80 [00:52<00:00,  1.53it/s]\n",
-      "disco: 100%|██████████| 80/80 [00:51<00:00,  1.55it/s]\n",
-      "hiphop: 100%|██████████| 80/80 [00:51<00:00,  1.54it/s]\n",
-      "jazz: 100%|██████████| 80/80 [00:50<00:00,  1.59it/s]\n",
-      "metal: 100%|██████████| 80/80 [00:51<00:00,  1.55it/s]\n",
-      "pop: 100%|██████████| 80/80 [00:50<00:00,  1.57it/s]\n",
-      "reggae: 100%|██████████| 80/80 [00:51<00:00,  1.56it/s]\n",
-      "rock: 100%|██████████| 80/80 [00:52<00:00,  1.53it/s]"
+      "\u001b[34m\u001b[1mwandb\u001b[0m: W&B API key is configured. Use \u001b[1m`wandb login --relogin`\u001b[0m to force relogin\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: setting up run pw8fvtfv\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: Tracking run with wandb version 0.22.2\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: Run data is saved locally in \u001b[35m\u001b[1m/kaggle/working/wandb/run-20260314_133420-pw8fvtfv\u001b[0m\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: Run \u001b[1m`wandb offline`\u001b[0m to turn off syncing.\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: Syncing run \u001b[33mMelCNN-Scratch\u001b[0m\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: ⭐️ View project at \u001b[34m\u001b[4mhttps://wandb.ai/choprayuvraj-iit-madras/24f2002642-t12026\u001b[0m\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: 🚀 View run at \u001b[34m\u001b[4mhttps://wandb.ai/choprayuvraj-iit-madras/24f2002642-t12026/runs/pw8fvtfv\u001b[0m\n",
+      "Train 1/12: 100%|██████████| 250/250 [13:48<00:00,  3.31s/it]\n",
+      "Val: 100%|██████████| 10/10 [00:46<00:00,  4.62s/it]\n"
      ]
     },
     {
      "name": "stdout",
      "output_type": "stream",
      "text": [
-      "\n",
-      "Train set: (2400, 124), labels: (2400,)\n"
+      "Ep 1/12 | train_loss=1.7168 train_acc=0.3977 val_loss=2.2880 val_acc=0.4000 val_f1=0.3326\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Train 2/12: 100%|██████████| 250/250 [12:12<00:00,  2.93s/it]\n",
+      "Val: 100%|██████████| 10/10 [00:28<00:00,  2.86s/it]\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Ep 2/12 | train_loss=1.4246 train_acc=0.5082 val_loss=1.2521 val_acc=0.7333 val_f1=0.7244\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Train 3/12: 100%|██████████| 250/250 [12:15<00:00,  2.94s/it]\n",
+      "Val: 100%|██████████| 10/10 [00:28<00:00,  2.85s/it]\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Ep 3/12 | train_loss=1.2752 train_acc=0.5637 val_loss=1.4268 val_acc=0.6600 val_f1=0.6322\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Train 4/12: 100%|██████████| 250/250 [12:16<00:00,  2.94s/it]\n",
+      "Val: 100%|██████████| 10/10 [00:28<00:00,  2.81s/it]\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Ep 4/12 | train_loss=1.1623 train_acc=0.6615 val_loss=1.4363 val_acc=0.6733 val_f1=0.6391\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Train 5/12: 100%|██████████| 250/250 [12:13<00:00,  2.93s/it]\n",
+      "Val: 100%|██████████| 10/10 [00:28<00:00,  2.88s/it]\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Ep 5/12 | train_loss=1.1258 train_acc=0.6617 val_loss=1.2457 val_acc=0.7000 val_f1=0.6925\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Train 6/12: 100%|██████████| 250/250 [12:11<00:00,  2.93s/it]\n",
+      "Val: 100%|██████████| 10/10 [00:28<00:00,  2.87s/it]\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Ep 6/12 | train_loss=1.0562 train_acc=0.6845 val_loss=1.5270 val_acc=0.6533 val_f1=0.6436\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Train 7/12: 100%|██████████| 250/250 [12:14<00:00,  2.94s/it]\n",
+      "Val: 100%|██████████| 10/10 [00:28<00:00,  2.89s/it]\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Ep 7/12 | train_loss=1.0113 train_acc=0.6987 val_loss=1.2409 val_acc=0.7467 val_f1=0.7474\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Train 8/12: 100%|██████████| 250/250 [12:10<00:00,  2.92s/it]\n",
+      "Val: 100%|██████████| 10/10 [00:28<00:00,  2.87s/it]\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Ep 8/12 | train_loss=0.9612 train_acc=0.7350 val_loss=1.0503 val_acc=0.8200 val_f1=0.8207\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Train 9/12: 100%|██████████| 250/250 [12:14<00:00,  2.94s/it]\n",
+      "Val: 100%|██████████| 10/10 [00:29<00:00,  2.95s/it]\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Ep 9/12 | train_loss=0.9077 train_acc=0.7545 val_loss=1.0218 val_acc=0.8467 val_f1=0.8435\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Train 10/12: 100%|██████████| 250/250 [12:21<00:00,  2.97s/it]\n",
+      "Val: 100%|██████████| 10/10 [00:29<00:00,  2.95s/it]\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Ep 10/12 | train_loss=0.8497 train_acc=0.7815 val_loss=0.9611 val_acc=0.8200 val_f1=0.8197\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Train 11/12: 100%|██████████| 250/250 [12:20<00:00,  2.96s/it]\n",
+      "Val: 100%|██████████| 10/10 [00:28<00:00,  2.89s/it]\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Ep 11/12 | train_loss=0.8681 train_acc=0.7598 val_loss=0.9161 val_acc=0.8667 val_f1=0.8640\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Train 12/12: 100%|██████████| 250/250 [12:23<00:00,  2.97s/it]\n",
+      "Val: 100%|██████████| 10/10 [00:29<00:00,  2.96s/it]\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: updating run metadata\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Ep 12/12 | train_loss=0.8615 train_acc=0.7993 val_loss=0.9287 val_acc=0.8533 val_f1=0.8510\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "\u001b[34m\u001b[1mwandb\u001b[0m: uploading output.log; uploading config.yaml\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: \n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: Run history:\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m:      epoch ▁▂▂▃▄▄▅▅▆▇▇█\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m:         lr ██▇▆▅▅▄▃▂▁▁▁\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m:  train_acc ▁▃▄▆▆▆▆▇▇█▇█\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: train_loss █▆▄▄▃▃▂▂▁▁▁▁\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m:    val_acc ▁▆▅▅▅▅▆▇█▇██\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m:     val_f1 ▁▆▅▅▆▅▆▇█▇██\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m:   val_loss █▃▄▄▃▄▃▂▂▁▁▁\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: \n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: Run summary:\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m:      epoch 12\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m:         lr 0\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m:  train_acc 0.79925\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: train_loss 0.86148\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m:    val_acc 0.85333\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m:     val_f1 0.851\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m:   val_loss 0.92868\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: \n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: 🚀 View run \u001b[33mMelCNN-Scratch\u001b[0m at: \u001b[34m\u001b[4mhttps://wandb.ai/choprayuvraj-iit-madras/24f2002642-t12026/runs/pw8fvtfv\u001b[0m\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: ⭐️ View project at: \u001b[34m\u001b[4mhttps://wandb.ai/choprayuvraj-iit-madras/24f2002642-t12026\u001b[0m\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: Find logs at: \u001b[35m\u001b[1m./wandb/run-20260314_133420-pw8fvtfv/logs\u001b[0m\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Best val F1: 0.8640\n"
+     ]
+    }
+   ],
+   "source": [
+    "def mixup_batch(x, y, alpha=MIXUP_ALPHA):\n",
+    "    lam = np.random.beta(alpha, alpha)\n",
+    "    idx = torch.randperm(x.size(0), device=x.device)\n",
+    "    return lam * x + (1 - lam) * x[idx], y, y[idx], lam\n",
+    "\n",
+    "\n",
+    "criterion  = nn.CrossEntropyLoss(label_smoothing=0.1)\n",
+    "optimizer  = torch.optim.AdamW(model.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)\n",
+    "f1_metric  = MulticlassF1Score(num_classes=len(GENRES), average='macro').to(DEVICE)\n",
+    "scheduler  = torch.optim.lr_scheduler.CosineAnnealingLR(\n",
+    "    optimizer, T_max=len(train_loader) * EPOCHS\n",
+    ")\n",
+    "\n",
+    "run = wandb.init(\n",
+    "    entity  = 'choprayuvraj-iit-madras',\n",
+    "    project = '24f2002642-t12026',\n",
+    "    name    = 'MelCNN-Scratch',\n",
+    "    config  = {\n",
+    "        'architecture': 'MelCNN', 'epochs': EPOCHS,\n",
+    "        'lr': LR, 'batch_size': BATCH_SIZE,\n",
+    "        'n_mels': N_MELS, 'duration': DURATION,\n",
+    "        'mixup_alpha': MIXUP_ALPHA, 'train_size': TRAIN_SIZE\n",
+    "    }\n",
+    ")\n",
+    "\n",
+    "best_val_f1 = 0\n",
+    "best_path   = '/kaggle/working/best_cnn.pth'\n",
+    "\n",
+    "for epoch in range(EPOCHS):\n",
+    "    model.train()\n",
+    "    f1_metric.reset()\n",
+    "    run_loss = 0.0\n",
+    "    correct  = 0\n",
+    "    n_total  = 0\n",
+    "\n",
+    "    for wav, labels in tqdm(train_loader, desc=f'Train {epoch+1}/{EPOCHS}'):\n",
+    "        wav    = wav.to(DEVICE)\n",
+    "        labels = labels.to(DEVICE)\n",
+    "        spec   = to_mel(wav, augment=True)\n",
+    "\n",
+    "        use_mixup = random.random() < MIXUP_PROB\n",
+    "        if use_mixup:\n",
+    "            spec, labels_a, labels_b, lam = mixup_batch(spec, labels)\n",
+    "            logits      = model(spec)\n",
+    "            loss        = lam * criterion(logits, labels_a) + (1 - lam) * criterion(logits, labels_b)\n",
+    "            true_labels = labels_a\n",
+    "        else:\n",
+    "            logits      = model(spec)\n",
+    "            loss        = criterion(logits, labels)\n",
+    "            true_labels = labels\n",
+    "\n",
+    "        optimizer.zero_grad()\n",
+    "        loss.backward()\n",
+    "        torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)\n",
+    "        optimizer.step()\n",
+    "        scheduler.step()\n",
+    "\n",
+    "        run_loss += loss.item()\n",
+    "        preds     = logits.argmax(dim=1)\n",
+    "        correct  += (preds == true_labels).sum().item()\n",
+    "        n_total  += labels.size(0)\n",
+    "        f1_metric.update(preds, true_labels)\n",
+    "\n",
+    "    train_loss = run_loss / len(train_loader)\n",
+    "    train_acc  = correct / n_total\n",
+    "    train_f1   = f1_metric.compute().item()\n",
+    "\n",
+    "    model.eval()\n",
+    "    f1_metric.reset()\n",
+    "    v_loss = 0.0\n",
+    "    v_corr = 0\n",
+    "    v_tot  = 0\n",
+    "\n",
+    "    with torch.no_grad():\n",
+    "        for wav, labels in tqdm(val_loader, desc='Val'):\n",
+    "            wav    = wav.to(DEVICE)\n",
+    "            labels = labels.to(DEVICE)\n",
+    "            spec   = to_mel(wav, augment=False)\n",
+    "            logits = model(spec)\n",
+    "            v_loss += criterion(logits, labels).item()\n",
+    "            preds   = logits.argmax(dim=1)\n",
+    "            v_corr += (preds == labels).sum().item()\n",
+    "            v_tot  += labels.size(0)\n",
+    "            f1_metric.update(preds, labels)\n",
+    "\n",
+    "    val_loss = v_loss / len(val_loader)\n",
+    "    val_acc  = v_corr / v_tot\n",
+    "    val_f1   = f1_metric.compute().item()\n",
+    "    cur_lr   = scheduler.get_last_lr()[0]\n",
+    "\n",
+    "    wandb.log({\n",
+    "        'epoch': epoch + 1,\n",
+    "        'train_loss': train_loss, 'train_acc': train_acc,\n",
+    "        'val_loss':   val_loss,   'val_acc':   val_acc,\n",
+    "        'val_f1':     val_f1,     'lr':        cur_lr\n",
+    "    })\n",
+    "\n",
+    "    print(f'Ep {epoch+1}/{EPOCHS} | '\n",
+    "          f'train_loss={train_loss:.4f} train_acc={train_acc:.4f} '\n",
+    "          f'val_loss={val_loss:.4f} val_acc={val_acc:.4f} val_f1={val_f1:.4f}')\n",
+    "\n",
+    "    if val_f1 > best_val_f1:\n",
+    "        best_val_f1 = val_f1\n",
+    "        torch.save(model.state_dict(), best_path)\n",
+    "\n",
+    "wandb.finish()\n",
+    "print(f'Best val F1: {best_val_f1:.4f}')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "56aa1e22",
+   "metadata": {
+    "papermill": {
+     "duration": 0.116438,
+     "end_time": "2026-03-14T16:09:12.618277",
+     "exception": false,
+     "start_time": "2026-03-14T16:09:12.501839",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "## 6. Inference & Submission"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "id": "a9f00dfd",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2026-03-14T16:09:12.856551Z",
+     "iopub.status.busy": "2026-03-14T16:09:12.856188Z",
+     "iopub.status.idle": "2026-03-14T16:13:44.050214Z",
+     "shell.execute_reply": "2026-03-14T16:13:44.049014Z"
+    },
+    "papermill": {
+     "duration": 271.315915,
+     "end_time": "2026-03-14T16:13:44.052103",
+     "exception": false,
+     "start_time": "2026-03-14T16:09:12.736188",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Inference: 100%|██████████| 3020/3020 [04:31<00:00, 11.14it/s]"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "genre\n",
+      "pop          800\n",
+      "hiphop       470\n",
+      "rock         338\n",
+      "classical    326\n",
+      "metal        273\n",
+      "blues        258\n",
+      "jazz         210\n",
+      "disco        153\n",
+      "reggae       149\n",
+      "country       43\n",
+      "Name: count, dtype: int64\n",
+      "   id      genre\n",
+      "0   1        pop\n",
+      "1   2  classical\n",
+      "2   3      blues\n",
+      "3   4      metal\n",
+      "4   5    country\n"
      ]
     },
     {
@@ -372,282 +947,13 @@
     }
    ],
    "source": [
-    "X_train = []\n",
-    "y_train = []\n",
+    "N_TTA     = 5\n",
+    "NOISE_STD = 0.005\n",
     "\n",
-    "for genre in GENRES:\n",
-    "    genre_path = os.path.join(GENRES_PATH, genre)\n",
-    "    song_dirs  = sorted([\n",
-    "        os.path.join(genre_path, d)\n",
-    "        for d in os.listdir(genre_path)\n",
-    "        if os.path.isdir(os.path.join(genre_path, d))\n",
-    "        and all(os.path.exists(os.path.join(genre_path, d, s)) for s in STEMS)\n",
-    "    ])\n",
+    "model.load_state_dict(torch.load(best_path))\n",
+    "model.eval()\n",
     "\n",
-    "    song_dirs = song_dirs[:SONGS_PER_GENRE]\n",
-    "\n",
-    "    for song_path in tqdm(song_dirs, desc=genre):\n",
-    "        try:\n",
-    "            audio = load_and_mix(song_path)\n",
-    "            for _ in range(CLIPS_PER_SONG):\n",
-    "                clip  = random_crop(audio)\n",
-    "                feats = extract_features(clip)\n",
-    "                X_train.append(feats)\n",
-    "                y_train.append(label2id[genre])\n",
-    "        except Exception as e:\n",
-    "            print(f'  skip {song_path}: {e}')\n",
-    "\n",
-    "X_train = np.array(X_train)\n",
-    "y_train = np.array(y_train)\n",
-    "print(f'\\nTrain set: {X_train.shape}, labels: {y_train.shape}')"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "id": "170d43fd",
-   "metadata": {
-    "papermill": {
-     "duration": 0.042648,
-     "end_time": "2026-03-14T12:00:55.853046",
-     "exception": false,
-     "start_time": "2026-03-14T12:00:55.810398",
-     "status": "completed"
-    },
-    "tags": []
-   },
-   "source": [
-    "## 5. Train LightGBM with 5-Fold CV"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 6,
-   "id": "9ab4e6a7",
-   "metadata": {
-    "execution": {
-     "iopub.execute_input": "2026-03-14T12:00:55.914309Z",
-     "iopub.status.busy": "2026-03-14T12:00:55.913813Z",
-     "iopub.status.idle": "2026-03-14T12:01:23.932856Z",
-     "shell.execute_reply": "2026-03-14T12:01:23.931400Z"
-    },
-    "papermill": {
-     "duration": 28.052135,
-     "end_time": "2026-03-14T12:01:23.935074",
-     "exception": false,
-     "start_time": "2026-03-14T12:00:55.882939",
-     "status": "completed"
-    },
-    "tags": []
-   },
-   "outputs": [
-    {
-     "name": "stderr",
-     "output_type": "stream",
-     "text": [
-      "\u001b[34m\u001b[1mwandb\u001b[0m: W&B API key is configured. Use \u001b[1m`wandb login --relogin`\u001b[0m to force relogin\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: setting up run spxfbg1s\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: Tracking run with wandb version 0.22.2\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: Run data is saved locally in \u001b[35m\u001b[1m/kaggle/working/wandb/run-20260314_120056-spxfbg1s\u001b[0m\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: Run \u001b[1m`wandb offline`\u001b[0m to turn off syncing.\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: Syncing run \u001b[33mMFCC-LightGBM-Baseline\u001b[0m\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: ⭐️ View project at \u001b[34m\u001b[4mhttps://wandb.ai/choprayuvraj-iit-madras/24f2002642-t12026\u001b[0m\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: 🚀 View run at \u001b[34m\u001b[4mhttps://wandb.ai/choprayuvraj-iit-madras/24f2002642-t12026/runs/spxfbg1s\u001b[0m\n"
-     ]
-    },
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "[50]\tvalid_0's multi_logloss: 0.450125\n",
-      "[100]\tvalid_0's multi_logloss: 0.301206\n",
-      "[150]\tvalid_0's multi_logloss: 0.272011\n",
-      "[200]\tvalid_0's multi_logloss: 0.26413\n",
-      "Fold 1 | val macro F1 = 0.9155 | best iter = 207\n",
-      "[50]\tvalid_0's multi_logloss: 0.419457\n",
-      "[100]\tvalid_0's multi_logloss: 0.271509\n",
-      "[150]\tvalid_0's multi_logloss: 0.236515\n",
-      "[200]\tvalid_0's multi_logloss: 0.229503\n",
-      "Fold 2 | val macro F1 = 0.9311 | best iter = 210\n",
-      "[50]\tvalid_0's multi_logloss: 0.400865\n",
-      "[100]\tvalid_0's multi_logloss: 0.260183\n",
-      "[150]\tvalid_0's multi_logloss: 0.234763\n",
-      "[200]\tvalid_0's multi_logloss: 0.227731\n",
-      "[250]\tvalid_0's multi_logloss: 0.227473\n",
-      "[300]\tvalid_0's multi_logloss: 0.227473\n",
-      "[350]\tvalid_0's multi_logloss: 0.227473\n",
-      "[400]\tvalid_0's multi_logloss: 0.227473\n",
-      "[450]\tvalid_0's multi_logloss: 0.227473\n",
-      "[500]\tvalid_0's multi_logloss: 0.227473\n",
-      "Fold 3 | val macro F1 = 0.9246 | best iter = 500\n",
-      "[50]\tvalid_0's multi_logloss: 0.421804\n",
-      "[100]\tvalid_0's multi_logloss: 0.263867\n",
-      "[150]\tvalid_0's multi_logloss: 0.233632\n",
-      "[200]\tvalid_0's multi_logloss: 0.223494\n",
-      "Fold 4 | val macro F1 = 0.9333 | best iter = 212\n",
-      "[50]\tvalid_0's multi_logloss: 0.449894\n",
-      "[100]\tvalid_0's multi_logloss: 0.303154\n",
-      "[150]\tvalid_0's multi_logloss: 0.271571\n",
-      "[200]\tvalid_0's multi_logloss: 0.267093\n",
-      "Fold 5 | val macro F1 = 0.9187 | best iter = 186\n",
-      "\n",
-      "CV mean macro F1: 0.9246\n"
-     ]
-    }
-   ],
-   "source": [
-    "params = {\n",
-    "    'objective'        : 'multiclass',\n",
-    "    'num_class'        : len(GENRES),\n",
-    "    'metric'           : 'multi_logloss',\n",
-    "    'learning_rate'    : 0.05,\n",
-    "    'num_leaves'       : 63,\n",
-    "    'max_depth'        : -1,\n",
-    "    'min_child_samples': 20,\n",
-    "    'subsample'        : 0.8,\n",
-    "    'colsample_bytree' : 0.8,\n",
-    "    'reg_alpha'        : 0.1,\n",
-    "    'reg_lambda'       : 0.1,\n",
-    "    'n_jobs'           : -1,\n",
-    "    'verbose'          : -1,\n",
-    "    'seed'             : 42,\n",
-    "}\n",
-    "\n",
-    "run = wandb.init(\n",
-    "    entity  = 'choprayuvraj-iit-madras',\n",
-    "    project = '24f2002642-t12026',\n",
-    "    name    = 'MFCC-LightGBM-Baseline',\n",
-    "    config  = {\n",
-    "        'model'           : 'LightGBM',\n",
-    "        'features'        : 'MFCC+Chroma+Contrast+RMS+ZCR+Rolloff',\n",
-    "        'n_mfcc'          : N_MFCC,\n",
-    "        'duration'        : DURATION,\n",
-    "        'clips_per_song'  : CLIPS_PER_SONG,\n",
-    "        'songs_per_genre' : SONGS_PER_GENRE,\n",
-    "        'learning_rate'   : params['learning_rate'],\n",
-    "        'num_leaves'      : params['num_leaves'],\n",
-    "    }\n",
-    ")\n",
-    "\n",
-    "skf     = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)\n",
-    "oof_f1s = []\n",
-    "models  = []\n",
-    "\n",
-    "for fold, (tr_idx, va_idx) in enumerate(skf.split(X_train, y_train)):\n",
-    "    X_tr, X_va = X_train[tr_idx], X_train[va_idx]\n",
-    "    y_tr, y_va = y_train[tr_idx], y_train[va_idx]\n",
-    "\n",
-    "    dtrain = lgb.Dataset(X_tr, label=y_tr)\n",
-    "    dval   = lgb.Dataset(X_va, label=y_va, reference=dtrain)\n",
-    "\n",
-    "    model = lgb.train(\n",
-    "        params,\n",
-    "        dtrain,\n",
-    "        num_boost_round      = 500,\n",
-    "        valid_sets           = [dval],\n",
-    "        callbacks            = [\n",
-    "            lgb.early_stopping(stopping_rounds=30, verbose=False),\n",
-    "            lgb.log_evaluation(period=50)\n",
-    "        ]\n",
-    "    )\n",
-    "\n",
-    "    preds = model.predict(X_va) \n",
-    "    pred_labels = np.argmax(preds, axis=1)\n",
-    "    f1  = f1_score(y_va, pred_labels, average='macro')\n",
-    "    oof_f1s.append(f1)\n",
-    "    models.append(model)\n",
-    "\n",
-    "    wandb.log({'fold': fold + 1, 'val_f1': f1})\n",
-    "    print(f'Fold {fold+1} | val macro F1 = {f1:.4f} | best iter = {model.best_iteration}')\n",
-    "\n",
-    "mean_f1 = np.mean(oof_f1s)\n",
-    "wandb.log({'cv_mean_f1': mean_f1})\n",
-    "print(f'\\nCV mean macro F1: {mean_f1:.4f}')"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "id": "5786b2b2",
-   "metadata": {
-    "papermill": {
-     "duration": 0.030801,
-     "end_time": "2026-03-14T12:01:23.999243",
-     "exception": false,
-     "start_time": "2026-03-14T12:01:23.968442",
-     "status": "completed"
-    },
-    "tags": []
-   },
-   "source": [
-    "## 6. Test Inference & Submission"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 7,
-   "id": "70286d1e",
-   "metadata": {
-    "execution": {
-     "iopub.execute_input": "2026-03-14T12:01:24.063500Z",
-     "iopub.status.busy": "2026-03-14T12:01:24.062947Z",
-     "iopub.status.idle": "2026-03-14T12:32:14.622478Z",
-     "shell.execute_reply": "2026-03-14T12:32:14.621768Z"
-    },
-    "papermill": {
-     "duration": 1850.593285,
-     "end_time": "2026-03-14T12:32:14.623945",
-     "exception": false,
-     "start_time": "2026-03-14T12:01:24.030660",
-     "status": "completed"
-    },
-    "tags": []
-   },
-   "outputs": [
-    {
-     "name": "stderr",
-     "output_type": "stream",
-     "text": [
-      "Inference: 100%|██████████| 3020/3020 [30:49<00:00,  1.63it/s]\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: updating run metadata\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: uploading data\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: \n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: Run history:\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: cv_mean_f1 ▁\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m:       fold ▁▃▅▆█\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m:     val_f1 ▁▇▅█▂\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: \n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: Run summary:\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: cv_mean_f1 0.92463\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m:       fold 5\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m:     val_f1 0.91866\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: \n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: 🚀 View run \u001b[33mMFCC-LightGBM-Baseline\u001b[0m at: \u001b[34m\u001b[4mhttps://wandb.ai/choprayuvraj-iit-madras/24f2002642-t12026/runs/spxfbg1s\u001b[0m\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: ⭐️ View project at: \u001b[34m\u001b[4mhttps://wandb.ai/choprayuvraj-iit-madras/24f2002642-t12026\u001b[0m\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: Find logs at: \u001b[35m\u001b[1m./wandb/run-20260314_120056-spxfbg1s/logs\u001b[0m\n"
-     ]
-    },
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "genre\n",
-      "reggae       1477\n",
-      "pop           752\n",
-      "hiphop        317\n",
-      "rock          191\n",
-      "jazz           96\n",
-      "metal          64\n",
-      "classical      56\n",
-      "country        44\n",
-      "disco          23\n",
-      "Name: count, dtype: int64\n"
-     ]
-    }
-   ],
-   "source": [
-    "N_TTA    = 5\n",
-    "test_df  = pd.read_csv(os.path.join(BASE_PATH, 'test.csv'))\n",
-    "\n",
+    "test_df    = pd.read_csv(os.path.join(BASE_PATH, 'test.csv'))\n",
     "id_to_file = {}\n",
     "for f in os.listdir(MASHUPS_PATH):\n",
     "    if f.endswith('.wav'):\n",
@@ -655,42 +961,43 @@
     "        if digits:\n",
     "            id_to_file[int(digits)] = f\n",
     "\n",
-    "all_ids   = []\n",
-    "all_preds = []\n",
+    "submission_data = []\n",
     "\n",
     "for idx in tqdm(range(len(test_df)), desc='Inference'):\n",
-    "    sid   = test_df.iloc[idx]['id']\n",
-    "    fname = id_to_file.get(sid)\n",
-    "    label = 'pop'   # fallback\n",
+    "    song_id = int(test_df.iloc[idx]['id'])\n",
+    "    fname   = id_to_file.get(song_id)\n",
     "\n",
-    "    if fname:\n",
-    "        try:\n",
-    "            audio, _ = librosa.load(\n",
-    "                os.path.join(MASHUPS_PATH, fname),\n",
-    "                sr=SAMPLE_RATE, mono=True\n",
-    "            )\n",
-    "            audio = audio / (np.max(np.abs(audio)) + 1e-6)\n",
+    "    try:\n",
+    "        wav, sr = torchaudio.load(os.path.join(MASHUPS_PATH, fname))\n",
+    "        if wav.shape[0] > 1:\n",
+    "            wav = wav.mean(dim=0, keepdim=True)\n",
+    "        if sr != SR:\n",
+    "            wav = AT.Resample(sr, SR)(wav)\n",
+    "        audio = wav.squeeze(0).numpy().astype(np.float32)\n",
+    "        audio = audio / (np.max(np.abs(audio)) + 1e-6)\n",
     "\n",
-    "            avg_probs = np.zeros(len(GENRES))\n",
-    "            for _ in range(N_TTA):\n",
-    "                clip  = random_crop(audio)\n",
-    "                feats = extract_features(clip).reshape(1, -1)\n",
-    "                # average predictions across all 5 CV folds\n",
-    "                fold_probs = np.mean([m.predict(feats)[0] for m in models], axis=0)\n",
-    "                avg_probs += fold_probs\n",
+    "        all_probs = []\n",
+    "        for tta_i in range(N_TTA):\n",
+    "            clip = crop_random(audio)\n",
+    "            t    = torch.tensor(clip).unsqueeze(0).unsqueeze(0).to(DEVICE)\n",
+    "            if tta_i > 0:\n",
+    "                t = t + torch.randn_like(t) * NOISE_STD\n",
+    "            spec = to_mel(t, augment=False)\n",
+    "            with torch.no_grad():\n",
+    "                probs = F.softmax(model(spec), dim=1)\n",
+    "            all_probs.append(probs.cpu().numpy())\n",
     "\n",
-    "            label = id2label[int(np.argmax(avg_probs))]\n",
-    "        except Exception as e:\n",
-    "            print(f'  skip {sid}: {e}')\n",
+    "        pred = id2label[int(np.argmax(np.mean(all_probs, axis=0)))]\n",
+    "        submission_data.append([song_id, pred])\n",
     "\n",
-    "    all_ids.append(sid)\n",
-    "    all_preds.append(label)\n",
+    "    except Exception:\n",
+    "        submission_data.append([song_id, 'pop'])\n",
     "\n",
-    "submission = pd.DataFrame({'id': all_ids, 'genre': all_preds})\n",
-    "submission.to_csv('/kaggle/working/submission_lgbm.csv', index=False)\n",
+    "submission_df = pd.DataFrame(submission_data, columns=['id', 'genre'])\n",
+    "submission_df.to_csv('/kaggle/working/submission.csv', index=False)\n",
     "\n",
-    "wandb.finish()\n",
-    "print(submission['genre'].value_counts())"
+    "print(submission_df['genre'].value_counts())\n",
+    "print(submission_df.head())"
    ]
   }
  ],
@@ -730,14 +1037,14 @@
   },
   "papermill": {
    "default_parameters": {},
-   "duration": 2442.256538,
-   "end_time": "2026-03-14T12:32:16.190295",
+   "duration": 9598.295193,
+   "end_time": "2026-03-14T16:13:46.955221",
    "environment_variables": {},
    "exception": null,
    "input_path": "__notebook__.ipynb",
    "output_path": "__notebook__.ipynb",
    "parameters": {},
-   "start_time": "2026-03-14T11:51:33.933757",
+   "start_time": "2026-03-14T13:33:48.660028",
    "version": "2.6.0"
   }
  },
