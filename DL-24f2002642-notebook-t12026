@@ -2,30 +2,30 @@
  "cells": [
   {
    "cell_type": "markdown",
-   "id": "777481e4",
+   "id": "48a4414b",
    "metadata": {
     "papermill": {
-     "duration": 0.003722,
-     "end_time": "2026-03-09T11:14:18.637853",
+     "duration": 0.002839,
+     "end_time": "2026-03-14T11:51:37.331889",
      "exception": false,
-     "start_time": "2026-03-09T11:14:18.634131",
+     "start_time": "2026-03-14T11:51:37.329050",
      "status": "completed"
     },
     "tags": []
    },
    "source": [
-    "# DL&GenAI Project"
+    "# Classical ML Baseline"
    ]
   },
   {
    "cell_type": "markdown",
-   "id": "de44f3ba",
+   "id": "c82d3930",
    "metadata": {
     "papermill": {
-     "duration": 0.002649,
-     "end_time": "2026-03-09T11:14:18.643280",
+     "duration": 0.001758,
+     "end_time": "2026-03-14T11:51:37.335576",
      "exception": false,
-     "start_time": "2026-03-09T11:14:18.640631",
+     "start_time": "2026-03-14T11:51:37.333818",
      "status": "completed"
     },
     "tags": []
@@ -37,46 +37,44 @@
   {
    "cell_type": "code",
    "execution_count": 1,
-   "id": "7c8c6415",
+   "id": "0b4a44b0",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2026-03-09T11:14:18.650284Z",
-     "iopub.status.busy": "2026-03-09T11:14:18.649538Z",
-     "iopub.status.idle": "2026-03-09T11:14:22.846702Z",
-     "shell.execute_reply": "2026-03-09T11:14:22.845950Z"
+     "iopub.execute_input": "2026-03-14T11:51:37.341644Z",
+     "iopub.status.busy": "2026-03-14T11:51:37.341361Z",
+     "iopub.status.idle": "2026-03-14T11:51:42.395980Z",
+     "shell.execute_reply": "2026-03-14T11:51:42.395118Z"
     },
     "papermill": {
-     "duration": 4.203155,
-     "end_time": "2026-03-09T11:14:22.849063",
+     "duration": 5.059085,
+     "end_time": "2026-03-14T11:51:42.397716",
      "exception": false,
-     "start_time": "2026-03-09T11:14:18.645908",
+     "start_time": "2026-03-14T11:51:37.338631",
      "status": "completed"
     },
     "tags": []
    },
    "outputs": [],
    "source": [
-    "!pip install -q transformers librosa torchmetrics wandb"
+    "!pip install -q lightgbm wandb"
    ]
   },
   {
    "cell_type": "code",
    "execution_count": 2,
-   "id": "9258a978",
+   "id": "da247bf0",
    "metadata": {
-    "_cell_guid": "b1076dfc-b9ad-4769-8c92-a6c4dae69d19",
-    "_uuid": "8f2839f25d086af736a60e9eeb907d3b93b6e0e5",
     "execution": {
-     "iopub.execute_input": "2026-03-09T11:14:22.856766Z",
-     "iopub.status.busy": "2026-03-09T11:14:22.856276Z",
-     "iopub.status.idle": "2026-03-09T11:14:54.661111Z",
-     "shell.execute_reply": "2026-03-09T11:14:54.660477Z"
+     "iopub.execute_input": "2026-03-14T11:51:42.403242Z",
+     "iopub.status.busy": "2026-03-14T11:51:42.402974Z",
+     "iopub.status.idle": "2026-03-14T11:51:55.243533Z",
+     "shell.execute_reply": "2026-03-14T11:51:55.242680Z"
     },
     "papermill": {
-     "duration": 31.810342,
-     "end_time": "2026-03-09T11:14:54.662573",
+     "duration": 12.845186,
+     "end_time": "2026-03-14T11:51:55.245046",
      "exception": false,
-     "start_time": "2026-03-09T11:14:22.852231",
+     "start_time": "2026-03-14T11:51:42.399860",
      "status": "completed"
     },
     "tags": []
@@ -86,27 +84,12 @@
      "name": "stderr",
      "output_type": "stream",
      "text": [
-      "2026-03-09 11:14:38.731922: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:467] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\n",
-      "WARNING: All log messages before absl::InitializeLog() is called are written to STDERR\n",
-      "E0000 00:00:1773054878.892878      24 cuda_dnn.cc:8579] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered\n",
-      "E0000 00:00:1773054878.938622      24 cuda_blas.cc:1407] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered\n",
-      "W0000 00:00:1773054879.337904      24 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
-      "W0000 00:00:1773054879.337941      24 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
-      "W0000 00:00:1773054879.337944      24 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
-      "W0000 00:00:1773054879.337946      24 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
       "/usr/local/lib/python3.12/dist-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The 'repr' attribute with value False was provided to the `Field()` function, which has no effect in the context it was used. 'repr' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.\n",
       "  warnings.warn(\n",
       "/usr/local/lib/python3.12/dist-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The 'frozen' attribute with value True was provided to the `Field()` function, which has no effect in the context it was used. 'frozen' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.\n",
       "  warnings.warn(\n",
       "\u001b[34m\u001b[1mwandb\u001b[0m: \u001b[33mWARNING\u001b[0m If you're specifying your api key in code, ensure this code is not shared publicly.\n",
       "\u001b[34m\u001b[1mwandb\u001b[0m: \u001b[33mWARNING\u001b[0m Consider setting the WANDB_API_KEY environment variable, or running `wandb login` from the command line.\n"
-     ]
-    },
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "cuda\n"
      ]
     }
    ],
@@ -116,25 +99,16 @@
     "import warnings\n",
     "import numpy as np\n",
     "import pandas as pd\n",
-    "import torch\n",
-    "import torch.nn as nn\n",
     "import librosa\n",
-    "from tqdm import tqdm\n",
-    "from torch.utils.data import Dataset, DataLoader\n",
-    "from transformers import (\n",
-    "    ASTFeatureExtractor,\n",
-    "    ASTForAudioClassification,\n",
-    "    get_cosine_schedule_with_warmup\n",
-    ")\n",
-    "from torchmetrics.classification import MulticlassF1Score\n",
+    "import lightgbm as lgb\n",
     "import wandb\n",
+    "from tqdm import tqdm\n",
+    "from sklearn.preprocessing import LabelEncoder\n",
+    "from sklearn.model_selection import StratifiedKFold\n",
+    "from sklearn.metrics import f1_score\n",
     "from kaggle_secrets import UserSecretsClient\n",
     "\n",
     "warnings.filterwarnings('ignore')\n",
-    "\n",
-    "netrc_path = os.path.expanduser(\"~/.netrc\")\n",
-    "if os.path.exists(netrc_path):\n",
-    "    os.remove(netrc_path)\n",
     "\n",
     "try:\n",
     "    user_secrets = UserSecretsClient()\n",
@@ -144,26 +118,19 @@
     "except Exception:\n",
     "    pass\n",
     "\n",
-    "def set_seed(seed=42):\n",
-    "    random.seed(seed)\n",
-    "    np.random.seed(seed)\n",
-    "    torch.manual_seed(seed)\n",
-    "    torch.cuda.manual_seed_all(seed)\n",
-    "\n",
-    "set_seed(42)\n",
-    "DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'\n",
-    "print(DEVICE)"
+    "random.seed(42)\n",
+    "np.random.seed(42)"
    ]
   },
   {
    "cell_type": "markdown",
-   "id": "f145f9b8",
+   "id": "42c26682",
    "metadata": {
     "papermill": {
-     "duration": 0.003033,
-     "end_time": "2026-03-09T11:14:54.668859",
+     "duration": 0.001939,
+     "end_time": "2026-03-14T11:51:55.249222",
      "exception": false,
-     "start_time": "2026-03-09T11:14:54.665826",
+     "start_time": "2026-03-14T11:51:55.247283",
      "status": "completed"
     },
     "tags": []
@@ -175,19 +142,19 @@
   {
    "cell_type": "code",
    "execution_count": 3,
-   "id": "96e8b668",
+   "id": "8b60439a",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2026-03-09T11:14:54.676097Z",
-     "iopub.status.busy": "2026-03-09T11:14:54.675629Z",
-     "iopub.status.idle": "2026-03-09T11:14:54.680437Z",
-     "shell.execute_reply": "2026-03-09T11:14:54.679879Z"
+     "iopub.execute_input": "2026-03-14T11:51:55.254152Z",
+     "iopub.status.busy": "2026-03-14T11:51:55.253921Z",
+     "iopub.status.idle": "2026-03-14T11:51:55.259878Z",
+     "shell.execute_reply": "2026-03-14T11:51:55.259174Z"
     },
     "papermill": {
-     "duration": 0.010022,
-     "end_time": "2026-03-09T11:14:54.681760",
+     "duration": 0.009951,
+     "end_time": "2026-03-14T11:51:55.261131",
      "exception": false,
-     "start_time": "2026-03-09T11:14:54.671738",
+     "start_time": "2026-03-14T11:51:55.251180",
      "status": "completed"
     },
     "tags": []
@@ -197,124 +164,78 @@
      "name": "stdout",
      "output_type": "stream",
      "text": [
-      "Device: cuda | Duration: 20s | Train size: 5000 | TTA: 5\n"
+      "Config done\n"
      ]
     }
    ],
    "source": [
-    "SAMPLE_RATE  = 16000\n",
-    "DURATION     = 20\n",
-    "MAX_LENGTH   = SAMPLE_RATE * DURATION\n",
+    "SAMPLE_RATE   = 22050\n",
+    "DURATION      = 10\n",
+    "MAX_LENGTH    = SAMPLE_RATE * DURATION\n",
     "\n",
-    "BATCH_SIZE   = 6\n",
-    "GRAD_ACCUM   = 2\n",
-    "NUM_WORKERS  = 2\n",
+    "N_MFCC        = 40\n",
+    "N_CHROMA      = 12\n",
+    "N_MELS        = 128\n",
     "\n",
-    "EPOCHS_P1    = 3\n",
-    "EPOCHS_P2    = 5\n",
-    "LR_P1        = 3e-4\n",
-    "LR_P2        = 2e-5\n",
-    "LR_HEAD_MULT = 10\n",
-    "WEIGHT_DECAY = 0.01\n",
+    "SONGS_PER_GENRE = 80       \n",
+    "CLIPS_PER_SONG  = 3         \n",
     "\n",
-    "TRAIN_SIZE   = 5000\n",
-    "NOISE_PROB   = 0.7\n",
-    "NOISE_LEVEL  = (0.03, 0.20)\n",
-    "TEMPO_PROB   = 0.4\n",
-    "TEMPO_RANGE  = (0.88, 1.12)\n",
-    "PATIENCE_P1  = 2\n",
-    "PATIENCE_P2  = 3\n",
+    "BASE_PATH     = '/kaggle/input/jan-2026-dl-gen-ai-project/messy_mashup'\n",
+    "GENRES_PATH   = os.path.join(BASE_PATH, 'genres_stems')\n",
+    "MASHUPS_PATH  = os.path.join(BASE_PATH, 'mashups')\n",
+    "STEMS         = ['drums.wav', 'vocals.wav', 'bass.wav', 'other.wav']\n",
     "\n",
-    "N_TTA = 5\n",
+    "GENRES    = ['blues', 'classical', 'country', 'disco', 'hiphop',\n",
+    "             'jazz', 'metal', 'pop', 'reggae', 'rock']\n",
+    "label2id  = {g: i for i, g in enumerate(GENRES)}\n",
+    "id2label  = {i: g for g, i in label2id.items()}\n",
     "\n",
-    "print(f'Device: {DEVICE} | Duration: {DURATION}s | Train size: {TRAIN_SIZE} | TTA: {N_TTA}')"
+    "print('Config done')"
    ]
   },
   {
    "cell_type": "markdown",
-   "id": "8c26ee97",
+   "id": "08c9eb35",
    "metadata": {
     "papermill": {
-     "duration": 0.002956,
-     "end_time": "2026-03-09T11:14:54.687727",
+     "duration": 0.001879,
+     "end_time": "2026-03-14T11:51:55.264961",
      "exception": false,
-     "start_time": "2026-03-09T11:14:54.684771",
+     "start_time": "2026-03-14T11:51:55.263082",
      "status": "completed"
     },
     "tags": []
    },
    "source": [
-    "## 3. Paths & Labels"
+    "## 3. Feature Extraction\n",
+    "\n",
+    "For each song I mix the 4 stems, take a random 10s crop, and extract:\n",
+    "- **MFCC** (40 coefficients × mean+std = 80 features) — captures timbre\n",
+    "- **Chroma** (12 × mean+std = 24) — captures pitch class distribution\n",
+    "- **Spectral contrast** (7 × mean+std = 14) — captures spectral peaks vs valleys\n",
+    "- **RMS energy** (mean+std = 2) — overall loudness\n",
+    "- **Zero crossing rate** (mean+std = 2) — noisiness / percussion\n",
+    "- **Spectral rolloff** (mean+std = 2) — brightness\n",
+    "\n",
+    "Total: **124 features per clip**"
    ]
   },
   {
    "cell_type": "code",
    "execution_count": 4,
-   "id": "ed72897b",
+   "id": "2dcfe702",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2026-03-09T11:14:54.694972Z",
-     "iopub.status.busy": "2026-03-09T11:14:54.694466Z",
-     "iopub.status.idle": "2026-03-09T11:14:54.699013Z",
-     "shell.execute_reply": "2026-03-09T11:14:54.698475Z"
+     "iopub.execute_input": "2026-03-14T11:51:55.269807Z",
+     "iopub.status.busy": "2026-03-14T11:51:55.269551Z",
+     "iopub.status.idle": "2026-03-14T11:52:08.292468Z",
+     "shell.execute_reply": "2026-03-14T11:52:08.291823Z"
     },
     "papermill": {
-     "duration": 0.009577,
-     "end_time": "2026-03-09T11:14:54.700321",
+     "duration": 13.027795,
+     "end_time": "2026-03-14T11:52:08.294660",
      "exception": false,
-     "start_time": "2026-03-09T11:14:54.690744",
-     "status": "completed"
-    },
-    "tags": []
-   },
-   "outputs": [],
-   "source": [
-    "BASE_PATH      = '/kaggle/input/jan-2026-dl-gen-ai-project/messy_mashup'\n",
-    "GENRES_PATH    = os.path.join(BASE_PATH, 'genres_stems')\n",
-    "ESC_PATH       = os.path.join(BASE_PATH, 'ESC-50-master', 'audio')\n",
-    "MASHUPS_PATH   = os.path.join(BASE_PATH, 'mashups')\n",
-    "REQUIRED_STEMS = ['drums.wav', 'vocals.wav', 'bass.wav', 'other.wav']\n",
-    "\n",
-    "GENRES   = ['blues', 'classical', 'country', 'disco', 'hiphop',\n",
-    "             'jazz', 'metal', 'pop', 'reggae', 'rock']\n",
-    "label2id = {g: i for i, g in enumerate(GENRES)}\n",
-    "id2label = {i: g for g, i in label2id.items()}\n",
-    "NUM_LABELS = len(GENRES)"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "id": "ed056c58",
-   "metadata": {
-    "papermill": {
-     "duration": 0.002989,
-     "end_time": "2026-03-09T11:14:54.706274",
-     "exception": false,
-     "start_time": "2026-03-09T11:14:54.703285",
-     "status": "completed"
-    },
-    "tags": []
-   },
-   "source": [
-    "## 4. Song Index & Train/Val Split"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 5,
-   "id": "44e7451a",
-   "metadata": {
-    "execution": {
-     "iopub.execute_input": "2026-03-09T11:14:54.713374Z",
-     "iopub.status.busy": "2026-03-09T11:14:54.712944Z",
-     "iopub.status.idle": "2026-03-09T11:15:03.220072Z",
-     "shell.execute_reply": "2026-03-09T11:15:03.219300Z"
-    },
-    "papermill": {
-     "duration": 8.512378,
-     "end_time": "2026-03-09T11:15:03.221602",
-     "exception": false,
-     "start_time": "2026-03-09T11:14:54.709224",
+     "start_time": "2026-03-14T11:51:55.266865",
      "status": "completed"
     },
     "tags": []
@@ -324,610 +245,122 @@
      "name": "stdout",
      "output_type": "stream",
      "text": [
-      "  blues: 100 songs\n",
-      "  classical: 100 songs\n",
-      "  country: 100 songs\n",
-      "  disco: 100 songs\n",
-      "  hiphop: 100 songs\n",
-      "  jazz: 100 songs\n",
-      "  metal: 100 songs\n",
-      "  pop: 100 songs\n",
-      "  reggae: 100 songs\n",
-      "  rock: 100 songs\n",
-      "Noise files: 2000\n"
+      "Feature vector size: 124\n"
      ]
     }
    ],
    "source": [
-    "def build_song_index():\n",
-    "    index = {}\n",
-    "    for genre in GENRES:\n",
-    "        genre_path = os.path.join(GENRES_PATH, genre)\n",
-    "        valid = []\n",
-    "        for folder in sorted(os.listdir(genre_path)):\n",
-    "            folder_path = os.path.join(genre_path, folder)\n",
-    "            if not os.path.isdir(folder_path):\n",
-    "                continue\n",
-    "            if all(os.path.exists(os.path.join(folder_path, s)) for s in REQUIRED_STEMS):\n",
-    "                valid.append(folder_path)\n",
-    "        index[genre] = valid\n",
-    "        print(f'  {genre}: {len(valid)} songs')\n",
-    "    return index\n",
+    "def load_and_mix(song_path):\n",
+    "    mixed = None\n",
+    "    for stem in STEMS:\n",
+    "        path  = os.path.join(song_path, stem)\n",
+    "        audio, _ = librosa.load(path, sr=SAMPLE_RATE, mono=True)\n",
+    "        audio = audio.astype(np.float32)\n",
+    "        mixed = audio if mixed is None else mixed + audio\n",
+    "    mixed = mixed / (np.max(np.abs(mixed)) + 1e-6)\n",
+    "    return mixed\n",
     "\n",
-    "song_index  = build_song_index()\n",
-    "noise_files = []\n",
-    "for root, _, files in os.walk(ESC_PATH):\n",
-    "    for f in files:\n",
-    "        if f.endswith('.wav'):\n",
-    "            noise_files.append(os.path.join(root, f))\n",
-    "print(f'Noise files: {len(noise_files)}')"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 6,
-   "id": "7b9d116a",
-   "metadata": {
-    "execution": {
-     "iopub.execute_input": "2026-03-09T11:15:03.230225Z",
-     "iopub.status.busy": "2026-03-09T11:15:03.229829Z",
-     "iopub.status.idle": "2026-03-09T11:15:03.235100Z",
-     "shell.execute_reply": "2026-03-09T11:15:03.234286Z"
-    },
-    "papermill": {
-     "duration": 0.010924,
-     "end_time": "2026-03-09T11:15:03.236426",
-     "exception": false,
-     "start_time": "2026-03-09T11:15:03.225502",
-     "status": "completed"
-    },
-    "tags": []
-   },
-   "outputs": [
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "  blues → Train: 85, Val: 15\n",
-      "  classical → Train: 85, Val: 15\n",
-      "  country → Train: 85, Val: 15\n",
-      "  disco → Train: 85, Val: 15\n",
-      "  hiphop → Train: 85, Val: 15\n",
-      "  jazz → Train: 85, Val: 15\n",
-      "  metal → Train: 85, Val: 15\n",
-      "  pop → Train: 85, Val: 15\n",
-      "  reggae → Train: 85, Val: 15\n",
-      "  rock → Train: 85, Val: 15\n"
-     ]
-    }
-   ],
-   "source": [
-    "train_index = {}\n",
-    "val_index   = {}\n",
     "\n",
-    "for genre in GENRES:\n",
-    "    songs = song_index[genre][:]\n",
-    "    random.shuffle(songs)\n",
-    "    split = int(0.85 * len(songs))\n",
-    "    train_index[genre] = songs[:split]\n",
-    "    val_index[genre]   = songs[split:]\n",
-    "    print(f'  {genre} → Train: {len(train_index[genre])}, Val: {len(val_index[genre])}')"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "id": "0f100450",
-   "metadata": {
-    "papermill": {
-     "duration": 0.003453,
-     "end_time": "2026-03-09T11:15:03.243395",
-     "exception": false,
-     "start_time": "2026-03-09T11:15:03.239942",
-     "status": "completed"
-    },
-    "tags": []
-   },
-   "source": [
-    "## 5. Audio Helpers"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 7,
-   "id": "afb6eea9",
-   "metadata": {
-    "execution": {
-     "iopub.execute_input": "2026-03-09T11:15:03.252441Z",
-     "iopub.status.busy": "2026-03-09T11:15:03.251707Z",
-     "iopub.status.idle": "2026-03-09T11:15:03.258966Z",
-     "shell.execute_reply": "2026-03-09T11:15:03.258409Z"
-    },
-    "papermill": {
-     "duration": 0.012759,
-     "end_time": "2026-03-09T11:15:03.260237",
-     "exception": false,
-     "start_time": "2026-03-09T11:15:03.247478",
-     "status": "completed"
-    },
-    "tags": []
-   },
-   "outputs": [],
-   "source": [
-    "def load_audio(path):\n",
-    "    audio, _ = librosa.load(path, sr=SAMPLE_RATE, mono=True)\n",
-    "    return audio.astype(np.float32)\n",
-    "\n",
-    "def normalize(audio):\n",
-    "    return audio / (np.max(np.abs(audio)) + 1e-6)\n",
-    "\n",
-    "def crop_random(audio):\n",
+    "def random_crop(audio):\n",
     "    if len(audio) >= MAX_LENGTH:\n",
     "        start = random.randint(0, len(audio) - MAX_LENGTH)\n",
     "        return audio[start: start + MAX_LENGTH]\n",
     "    return np.pad(audio, (0, MAX_LENGTH - len(audio)))\n",
     "\n",
-    "def crop_center(audio):\n",
-    "    if len(audio) >= MAX_LENGTH:\n",
-    "        start = (len(audio) - MAX_LENGTH) // 2\n",
-    "        return audio[start: start + MAX_LENGTH]\n",
-    "    return np.pad(audio, (0, MAX_LENGTH - len(audio)))\n",
     "\n",
-    "def random_gain(audio):\n",
-    "    return audio * random.uniform(0.7, 1.3)\n",
+    "def extract_features(audio, sr=SAMPLE_RATE):\n",
+    "    feats = []\n",
     "\n",
-    "def tempo_augment(audio):\n",
-    "    if random.random() < TEMPO_PROB:\n",
-    "        rate  = random.uniform(*TEMPO_RANGE)\n",
-    "        audio = librosa.effects.time_stretch(audio, rate=rate)\n",
-    "    return audio\n",
+    "    mfcc = librosa.feature.mfcc(y=audio, sr=sr, n_mfcc=N_MFCC)\n",
+    "    feats.extend(mfcc.mean(axis=1).tolist())\n",
+    "    feats.extend(mfcc.std(axis=1).tolist())\n",
     "\n",
-    "def add_noise(audio):\n",
-    "    if random.random() < NOISE_PROB and len(noise_files) > 0:\n",
-    "        noise = load_audio(random.choice(noise_files))\n",
-    "        noise = crop_random(noise)\n",
-    "        level = random.uniform(*NOISE_LEVEL)\n",
-    "        audio = audio + level * noise\n",
-    "    return audio"
+    "    chroma = librosa.feature.chroma_stft(y=audio, sr=sr, n_chroma=N_CHROMA)\n",
+    "    feats.extend(chroma.mean(axis=1).tolist())\n",
+    "    feats.extend(chroma.std(axis=1).tolist())\n",
+    "\n",
+    "    contrast = librosa.feature.spectral_contrast(y=audio, sr=sr)\n",
+    "    feats.extend(contrast.mean(axis=1).tolist())\n",
+    "    feats.extend(contrast.std(axis=1).tolist())\n",
+    "\n",
+    "    rms = librosa.feature.rms(y=audio)\n",
+    "    feats.append(float(rms.mean()))\n",
+    "    feats.append(float(rms.std()))\n",
+    "\n",
+    "    zcr = librosa.feature.zero_crossing_rate(y=audio)\n",
+    "    feats.append(float(zcr.mean()))\n",
+    "    feats.append(float(zcr.std()))\n",
+    "\n",
+    "    rolloff = librosa.feature.spectral_rolloff(y=audio, sr=sr)\n",
+    "    feats.append(float(rolloff.mean()))\n",
+    "    feats.append(float(rolloff.std()))\n",
+    "\n",
+    "    return np.array(feats, dtype=np.float32)\n",
+    "\n",
+    "\n",
+    "print(f'Feature vector size: {len(extract_features(np.zeros(MAX_LENGTH)))}')"
    ]
   },
   {
    "cell_type": "markdown",
-   "id": "79a1912d",
+   "id": "ab747f34",
    "metadata": {
     "papermill": {
-     "duration": 0.003353,
-     "end_time": "2026-03-09T11:15:03.267129",
+     "duration": 0.003315,
+     "end_time": "2026-03-14T11:52:08.301856",
      "exception": false,
-     "start_time": "2026-03-09T11:15:03.263776",
+     "start_time": "2026-03-14T11:52:08.298541",
      "status": "completed"
     },
     "tags": []
    },
    "source": [
-    "## 6. Load AST Model"
+    "## 4. Build Training Features"
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": 8,
-   "id": "2c2c875b",
+   "execution_count": 5,
+   "id": "226fa7f0",
    "metadata": {
-    "collapsed": true,
     "execution": {
-     "iopub.execute_input": "2026-03-09T11:15:03.275229Z",
-     "iopub.status.busy": "2026-03-09T11:15:03.274846Z",
-     "iopub.status.idle": "2026-03-09T11:15:10.466982Z",
-     "shell.execute_reply": "2026-03-09T11:15:10.466174Z"
-    },
-    "jupyter": {
-     "outputs_hidden": true
+     "iopub.execute_input": "2026-03-14T11:52:08.310497Z",
+     "iopub.status.busy": "2026-03-14T11:52:08.309822Z",
+     "iopub.status.idle": "2026-03-14T12:00:55.750628Z",
+     "shell.execute_reply": "2026-03-14T12:00:55.749941Z"
     },
     "papermill": {
-     "duration": 7.197962,
-     "end_time": "2026-03-09T11:15:10.468487",
+     "duration": 527.448272,
+     "end_time": "2026-03-14T12:00:55.753331",
      "exception": false,
-     "start_time": "2026-03-09T11:15:03.270525",
+     "start_time": "2026-03-14T11:52:08.305059",
      "status": "completed"
     },
     "tags": []
    },
    "outputs": [
     {
-     "data": {
-      "application/vnd.jupyter.widget-view+json": {
-       "model_id": "a431eeed5f994af28b07220dbd785353",
-       "version_major": 2,
-       "version_minor": 0
-      },
-      "text/plain": [
-       "preprocessor_config.json:   0%|          | 0.00/297 [00:00<?, ?B/s]"
-      ]
-     },
-     "metadata": {},
-     "output_type": "display_data"
-    },
-    {
-     "data": {
-      "application/vnd.jupyter.widget-view+json": {
-       "model_id": "775b5b246dbb43ecb4f2e57aaaba3853",
-       "version_major": 2,
-       "version_minor": 0
-      },
-      "text/plain": [
-       "config.json: 0.00B [00:00, ?B/s]"
-      ]
-     },
-     "metadata": {},
-     "output_type": "display_data"
-    },
-    {
-     "data": {
-      "application/vnd.jupyter.widget-view+json": {
-       "model_id": "28058d8e9f9c4933941dc383fa7ff34d",
-       "version_major": 2,
-       "version_minor": 0
-      },
-      "text/plain": [
-       "model.safetensors:   0%|          | 0.00/346M [00:00<?, ?B/s]"
-      ]
-     },
-     "metadata": {},
-     "output_type": "display_data"
-    },
-    {
      "name": "stderr",
      "output_type": "stream",
      "text": [
-      "Some weights of ASTForAudioClassification were not initialized from the model checkpoint at MIT/ast-finetuned-audioset-10-10-0.4593 and are newly initialized because the shapes did not match:\n",
-      "- classifier.dense.bias: found shape torch.Size([527]) in the checkpoint and torch.Size([10]) in the model instantiated\n",
-      "- classifier.dense.weight: found shape torch.Size([527, 768]) in the checkpoint and torch.Size([10, 768]) in the model instantiated\n",
-      "You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.\n"
+      "blues: 100%|██████████| 80/80 [00:54<00:00,  1.47it/s]\n",
+      "classical: 100%|██████████| 80/80 [00:49<00:00,  1.62it/s]\n",
+      "country: 100%|██████████| 80/80 [00:52<00:00,  1.53it/s]\n",
+      "disco: 100%|██████████| 80/80 [00:51<00:00,  1.55it/s]\n",
+      "hiphop: 100%|██████████| 80/80 [00:51<00:00,  1.54it/s]\n",
+      "jazz: 100%|██████████| 80/80 [00:50<00:00,  1.59it/s]\n",
+      "metal: 100%|██████████| 80/80 [00:51<00:00,  1.55it/s]\n",
+      "pop: 100%|██████████| 80/80 [00:50<00:00,  1.57it/s]\n",
+      "reggae: 100%|██████████| 80/80 [00:51<00:00,  1.56it/s]\n",
+      "rock: 100%|██████████| 80/80 [00:52<00:00,  1.53it/s]"
      ]
     },
     {
      "name": "stdout",
      "output_type": "stream",
      "text": [
-      "AST loaded on cuda | Total params: 86,196,490\n"
-     ]
-    }
-   ],
-   "source": [
-    "MODEL_NAME = 'MIT/ast-finetuned-audioset-10-10-0.4593'\n",
-    "\n",
-    "feature_extractor = ASTFeatureExtractor.from_pretrained(MODEL_NAME)\n",
-    "\n",
-    "model = ASTForAudioClassification.from_pretrained(\n",
-    "    MODEL_NAME,\n",
-    "    num_labels              = NUM_LABELS,\n",
-    "    id2label                = id2label,\n",
-    "    label2id                = label2id,\n",
-    "    ignore_mismatched_sizes = True\n",
-    ")\n",
-    "model.to(DEVICE)\n",
-    "\n",
-    "total_params = sum(p.numel() for p in model.parameters())\n",
-    "print(f'AST loaded on {DEVICE} | Total params: {total_params:,}')"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "id": "59a5b19a",
-   "metadata": {
-    "papermill": {
-     "duration": 0.00384,
-     "end_time": "2026-03-09T11:15:10.476535",
-     "exception": false,
-     "start_time": "2026-03-09T11:15:10.472695",
-     "status": "completed"
-    },
-    "tags": []
-   },
-   "source": [
-    "## 7. Datasets & DataLoaders"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 9,
-   "id": "d1815aca",
-   "metadata": {
-    "execution": {
-     "iopub.execute_input": "2026-03-09T11:15:10.485527Z",
-     "iopub.status.busy": "2026-03-09T11:15:10.485307Z",
-     "iopub.status.idle": "2026-03-09T11:15:10.495861Z",
-     "shell.execute_reply": "2026-03-09T11:15:10.495128Z"
-    },
-    "papermill": {
-     "duration": 0.016984,
-     "end_time": "2026-03-09T11:15:10.497392",
-     "exception": false,
-     "start_time": "2026-03-09T11:15:10.480408",
-     "status": "completed"
-    },
-    "tags": []
-   },
-   "outputs": [
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "Train: 5000 | Val: 150\n"
-     ]
-    }
-   ],
-   "source": [
-    "class TrainDataset(Dataset):\n",
-    "    def __init__(self, song_index, feature_extractor, size=TRAIN_SIZE):\n",
-    "        self.song_index        = song_index\n",
-    "        self.feature_extractor = feature_extractor\n",
-    "        self.size              = size\n",
-    "\n",
-    "    def __len__(self):\n",
-    "        return self.size\n",
-    "\n",
-    "    def __getitem__(self, idx):\n",
-    "        while True:\n",
-    "            try:\n",
-    "                genre = random.choice(GENRES)\n",
-    "                songs = self.song_index[genre]\n",
-    "                if len(songs) == 0:\n",
-    "                    continue\n",
-    "\n",
-    "                mixed = None\n",
-    "                for stem in REQUIRED_STEMS:\n",
-    "                    song_path = random.choice(songs)\n",
-    "                    audio     = load_audio(os.path.join(song_path, stem))\n",
-    "                    audio     = crop_random(audio)\n",
-    "                    audio     = tempo_augment(audio)\n",
-    "                    audio     = random_gain(audio)\n",
-    "                    mixed = audio if mixed is None else mixed + audio\n",
-    "\n",
-    "                mixed  = normalize(mixed)\n",
-    "                mixed  = add_noise(mixed)\n",
-    "                mixed  = normalize(mixed)\n",
-    "\n",
-    "                inputs = self.feature_extractor(\n",
-    "                    mixed,\n",
-    "                    sampling_rate  = SAMPLE_RATE,\n",
-    "                    return_tensors = 'pt'\n",
-    "                )\n",
-    "                return {\n",
-    "                    'input_values': inputs['input_values'].squeeze(0),\n",
-    "                    'labels'      : torch.tensor(label2id[genre], dtype=torch.long)\n",
-    "                }\n",
-    "            except Exception:\n",
-    "                continue\n",
-    "\n",
-    "\n",
-    "class ValDataset(Dataset):\n",
-    "    def __init__(self, song_index, feature_extractor):\n",
-    "        self.feature_extractor = feature_extractor\n",
-    "        self.samples = []\n",
-    "        for genre in GENRES:\n",
-    "            for song_path in song_index[genre]:\n",
-    "                self.samples.append((genre, song_path))\n",
-    "\n",
-    "    def __len__(self):\n",
-    "        return len(self.samples)\n",
-    "\n",
-    "    def __getitem__(self, idx):\n",
-    "        genre, song_path = self.samples[idx]\n",
-    "        mixed = None\n",
-    "        for stem in REQUIRED_STEMS:\n",
-    "            audio = load_audio(os.path.join(song_path, stem))\n",
-    "            audio = crop_center(audio)\n",
-    "            mixed = audio if mixed is None else mixed + audio\n",
-    "\n",
-    "        mixed  = normalize(mixed)\n",
-    "        inputs = self.feature_extractor(\n",
-    "            mixed,\n",
-    "            sampling_rate  = SAMPLE_RATE,\n",
-    "            return_tensors = 'pt'\n",
-    "        )\n",
-    "        return {\n",
-    "            'input_values': inputs['input_values'].squeeze(0),\n",
-    "            'labels'      : torch.tensor(label2id[genre], dtype=torch.long)\n",
-    "        }\n",
-    "\n",
-    "\n",
-    "train_dataset = TrainDataset(train_index, feature_extractor, size=TRAIN_SIZE)\n",
-    "val_dataset   = ValDataset(val_index, feature_extractor)\n",
-    "\n",
-    "train_loader = DataLoader(\n",
-    "    train_dataset, batch_size=BATCH_SIZE, shuffle=True,\n",
-    "    num_workers=NUM_WORKERS, pin_memory=True, persistent_workers=True\n",
-    ")\n",
-    "val_loader = DataLoader(\n",
-    "    val_dataset, batch_size=BATCH_SIZE, shuffle=False,\n",
-    "    num_workers=NUM_WORKERS, pin_memory=True, persistent_workers=True\n",
-    ")\n",
-    "\n",
-    "print(f'Train: {len(train_dataset)} | Val: {len(val_dataset)}')"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "id": "16e73574",
-   "metadata": {
-    "papermill": {
-     "duration": 0.003901,
-     "end_time": "2026-03-09T11:15:10.505178",
-     "exception": false,
-     "start_time": "2026-03-09T11:15:10.501277",
-     "status": "completed"
-    },
-    "tags": []
-   },
-   "source": [
-    "## 8. Loss, Metric & Train/Val Functions"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 10,
-   "id": "adefbc66",
-   "metadata": {
-    "execution": {
-     "iopub.execute_input": "2026-03-09T11:15:10.514546Z",
-     "iopub.status.busy": "2026-03-09T11:15:10.513952Z",
-     "iopub.status.idle": "2026-03-09T11:15:10.526048Z",
-     "shell.execute_reply": "2026-03-09T11:15:10.525496Z"
-    },
-    "papermill": {
-     "duration": 0.018167,
-     "end_time": "2026-03-09T11:15:10.527375",
-     "exception": false,
-     "start_time": "2026-03-09T11:15:10.509208",
-     "status": "completed"
-    },
-    "tags": []
-   },
-   "outputs": [],
-   "source": [
-    "criterion = nn.CrossEntropyLoss(label_smoothing=0.1)\n",
-    "f1_metric = MulticlassF1Score(num_classes=NUM_LABELS, average='macro').to(DEVICE)\n",
-    "\n",
-    "\n",
-    "def train_one_epoch(model, loader, optimizer, scheduler):\n",
-    "    model.train()\n",
-    "    f1_metric.reset()\n",
-    "    total_loss = 0\n",
-    "    optimizer.zero_grad()\n",
-    "\n",
-    "    for step, batch in enumerate(tqdm(loader, desc='Training')):\n",
-    "        input_values = batch['input_values'].to(DEVICE)\n",
-    "        labels       = batch['labels'].to(DEVICE)\n",
-    "\n",
-    "        outputs = model(input_values=input_values)\n",
-    "        loss    = criterion(outputs.logits, labels) / GRAD_ACCUM\n",
-    "        loss.backward()\n",
-    "\n",
-    "        if (step + 1) % GRAD_ACCUM == 0:\n",
-    "            torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)\n",
-    "            optimizer.step()\n",
-    "            scheduler.step()\n",
-    "            optimizer.zero_grad()\n",
-    "\n",
-    "        total_loss += loss.item() * GRAD_ACCUM\n",
-    "        f1_metric.update(torch.argmax(outputs.logits, dim=1), labels)\n",
-    "\n",
-    "    return total_loss / len(loader), f1_metric.compute().item()\n",
-    "\n",
-    "\n",
-    "def validate(model, loader):\n",
-    "    model.eval()\n",
-    "    f1_metric.reset()\n",
-    "    with torch.no_grad():\n",
-    "        for batch in tqdm(loader, desc='Validation'):\n",
-    "            input_values = batch['input_values'].to(DEVICE)\n",
-    "            labels       = batch['labels'].to(DEVICE)\n",
-    "            outputs      = model(input_values=input_values)\n",
-    "            f1_metric.update(torch.argmax(outputs.logits, dim=1), labels)\n",
-    "    return f1_metric.compute().item()"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "id": "407fd9c2",
-   "metadata": {
-    "papermill": {
-     "duration": 0.003922,
-     "end_time": "2026-03-09T11:15:10.535370",
-     "exception": false,
-     "start_time": "2026-03-09T11:15:10.531448",
-     "status": "completed"
-    },
-    "tags": []
-   },
-   "source": [
-    "## 9. Phase 1 — Classifier Warmup (Frozen Backbone)"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 11,
-   "id": "cf231c2c",
-   "metadata": {
-    "collapsed": true,
-    "execution": {
-     "iopub.execute_input": "2026-03-09T11:15:10.544438Z",
-     "iopub.status.busy": "2026-03-09T11:15:10.544212Z",
-     "iopub.status.idle": "2026-03-09T14:51:07.721720Z",
-     "shell.execute_reply": "2026-03-09T14:51:07.720649Z"
-    },
-    "jupyter": {
-     "outputs_hidden": true
-    },
-    "papermill": {
-     "duration": 12957.184135,
-     "end_time": "2026-03-09T14:51:07.723558",
-     "exception": false,
-     "start_time": "2026-03-09T11:15:10.539423",
-     "status": "completed"
-    },
-    "tags": []
-   },
-   "outputs": [
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "Phase 1: 9,226 trainable params (classifier head only)\n"
-     ]
-    },
-    {
-     "name": "stderr",
-     "output_type": "stream",
-     "text": [
-      "\u001b[34m\u001b[1mwandb\u001b[0m: W&B API key is configured. Use \u001b[1m`wandb login --relogin`\u001b[0m to force relogin\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: setting up run k9shv47q\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: Tracking run with wandb version 0.22.2\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: Run data is saved locally in \u001b[35m\u001b[1m/kaggle/working/wandb/run-20260309_111510-k9shv47q\u001b[0m\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: Run \u001b[1m`wandb offline`\u001b[0m to turn off syncing.\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: Syncing run \u001b[33mAST-Two-Phase-Finetune\u001b[0m\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: ⭐️ View project at \u001b[34m\u001b[4mhttps://wandb.ai/choprayuvraj-iit-madras/24f2002642-t12026\u001b[0m\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: 🚀 View run at \u001b[34m\u001b[4mhttps://wandb.ai/choprayuvraj-iit-madras/24f2002642-t12026/runs/k9shv47q\u001b[0m\n",
-      "Training: 100%|██████████| 834/834 [1:12:08<00:00,  5.19s/it]\n",
-      "Validation: 100%|██████████| 25/25 [00:36<00:00,  1.47s/it]\n"
-     ]
-    },
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "P1 Ep 1/3 | loss=1.2213 train_f1=0.7215 val_f1=0.7648\n"
-     ]
-    },
-    {
-     "name": "stderr",
-     "output_type": "stream",
-     "text": [
-      "Training: 100%|██████████| 834/834 [1:09:38<00:00,  5.01s/it]\n",
-      "Validation: 100%|██████████| 25/25 [00:17<00:00,  1.42it/s]\n"
-     ]
-    },
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "P1 Ep 2/3 | loss=0.8141 train_f1=0.8961 val_f1=0.8241\n"
-     ]
-    },
-    {
-     "name": "stderr",
-     "output_type": "stream",
-     "text": [
-      "Training: 100%|██████████| 834/834 [1:12:54<00:00,  5.24s/it]\n",
-      "Validation: 100%|██████████| 25/25 [00:18<00:00,  1.38it/s]"
-     ]
-    },
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "P1 Ep 3/3 | loss=0.7787 train_f1=0.9093 val_f1=0.8177\n",
-      "Phase 1 done — best val F1: 0.8241\n"
+      "\n",
+      "Train set: (2400, 124), labels: (2400,)\n"
      ]
     },
     {
@@ -939,298 +372,231 @@
     }
    ],
    "source": [
-    "for param in model.base_model.parameters():\n",
-    "    param.requires_grad = False\n",
+    "X_train = []\n",
+    "y_train = []\n",
     "\n",
-    "trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)\n",
-    "print(f'Phase 1: {trainable:,} trainable params (classifier head only)')\n",
+    "for genre in GENRES:\n",
+    "    genre_path = os.path.join(GENRES_PATH, genre)\n",
+    "    song_dirs  = sorted([\n",
+    "        os.path.join(genre_path, d)\n",
+    "        for d in os.listdir(genre_path)\n",
+    "        if os.path.isdir(os.path.join(genre_path, d))\n",
+    "        and all(os.path.exists(os.path.join(genre_path, d, s)) for s in STEMS)\n",
+    "    ])\n",
     "\n",
-    "optimizer_p1   = torch.optim.AdamW(\n",
-    "    filter(lambda p: p.requires_grad, model.parameters()),\n",
-    "    lr=LR_P1, weight_decay=WEIGHT_DECAY\n",
-    ")\n",
-    "total_steps_p1 = (len(train_loader) // GRAD_ACCUM) * EPOCHS_P1\n",
-    "scheduler_p1   = get_cosine_schedule_with_warmup(\n",
-    "    optimizer_p1,\n",
-    "    num_warmup_steps   = total_steps_p1 // 10,\n",
-    "    num_training_steps = total_steps_p1\n",
-    ")\n",
+    "    song_dirs = song_dirs[:SONGS_PER_GENRE]\n",
     "\n",
-    "run = wandb.init(\n",
-    "    entity   = 'choprayuvraj-iit-madras',\n",
-    "    project  = '24f2002642-t12026',\n",
-    "    name     = 'AST-Two-Phase-Finetune',\n",
-    "    job_type = 'train',\n",
-    "    config   = {\n",
-    "        'architecture': 'AST', 'model': MODEL_NAME,\n",
-    "        'epochs_p1': EPOCHS_P1, 'epochs_p2': EPOCHS_P2,\n",
-    "        'lr_p1': LR_P1, 'lr_p2': LR_P2,\n",
-    "        'train_size': TRAIN_SIZE, 'duration': DURATION, 'n_tta': N_TTA\n",
-    "    }\n",
-    ")\n",
+    "    for song_path in tqdm(song_dirs, desc=genre):\n",
+    "        try:\n",
+    "            audio = load_and_mix(song_path)\n",
+    "            for _ in range(CLIPS_PER_SONG):\n",
+    "                clip  = random_crop(audio)\n",
+    "                feats = extract_features(clip)\n",
+    "                X_train.append(feats)\n",
+    "                y_train.append(label2id[genre])\n",
+    "        except Exception as e:\n",
+    "            print(f'  skip {song_path}: {e}')\n",
     "\n",
-    "best_p1_f1   = 0\n",
-    "patience_cnt = 0\n",
-    "\n",
-    "for epoch in range(EPOCHS_P1):\n",
-    "    train_loss, train_f1 = train_one_epoch(model, train_loader, optimizer_p1, scheduler_p1)\n",
-    "    val_f1 = validate(model, val_loader)\n",
-    "\n",
-    "    wandb.log({'phase': 1, 'epoch': epoch + 1, 'train_loss': train_loss,\n",
-    "               'train_f1': train_f1, 'val_f1': val_f1})\n",
-    "    print(f'P1 Ep {epoch+1}/{EPOCHS_P1} | loss={train_loss:.4f} train_f1={train_f1:.4f} val_f1={val_f1:.4f}')\n",
-    "\n",
-    "    if val_f1 > best_p1_f1:\n",
-    "        best_p1_f1   = val_f1\n",
-    "        patience_cnt = 0\n",
-    "        torch.save(model.state_dict(), '/kaggle/working/best_model_phase1.pth')\n",
-    "    else:\n",
-    "        patience_cnt += 1\n",
-    "        if patience_cnt >= PATIENCE_P1:\n",
-    "            print('Early stopping Phase 1.')\n",
-    "            break\n",
-    "\n",
-    "print(f'Phase 1 done — best val F1: {best_p1_f1:.4f}')"
+    "X_train = np.array(X_train)\n",
+    "y_train = np.array(y_train)\n",
+    "print(f'\\nTrain set: {X_train.shape}, labels: {y_train.shape}')"
    ]
   },
   {
    "cell_type": "markdown",
-   "id": "86016ae8",
+   "id": "170d43fd",
    "metadata": {
     "papermill": {
-     "duration": 0.097633,
-     "end_time": "2026-03-09T14:51:07.917709",
+     "duration": 0.042648,
+     "end_time": "2026-03-14T12:00:55.853046",
      "exception": false,
-     "start_time": "2026-03-09T14:51:07.820076",
+     "start_time": "2026-03-14T12:00:55.810398",
      "status": "completed"
     },
     "tags": []
    },
    "source": [
-    "## 10. Phase 2 — Full Fine-Tune (Layer-wise LR)"
+    "## 5. Train LightGBM with 5-Fold CV"
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": 12,
-   "id": "3eab0f17",
+   "execution_count": 6,
+   "id": "9ab4e6a7",
    "metadata": {
-    "collapsed": true,
     "execution": {
-     "iopub.execute_input": "2026-03-09T14:51:08.113193Z",
-     "iopub.status.busy": "2026-03-09T14:51:08.112850Z",
-     "iopub.status.idle": "2026-03-09T21:08:22.319471Z",
-     "shell.execute_reply": "2026-03-09T21:08:22.318291Z"
-    },
-    "jupyter": {
-     "outputs_hidden": true
+     "iopub.execute_input": "2026-03-14T12:00:55.914309Z",
+     "iopub.status.busy": "2026-03-14T12:00:55.913813Z",
+     "iopub.status.idle": "2026-03-14T12:01:23.932856Z",
+     "shell.execute_reply": "2026-03-14T12:01:23.931400Z"
     },
     "papermill": {
-     "duration": 22634.306662,
-     "end_time": "2026-03-09T21:08:22.321799",
+     "duration": 28.052135,
+     "end_time": "2026-03-14T12:01:23.935074",
      "exception": false,
-     "start_time": "2026-03-09T14:51:08.015137",
+     "start_time": "2026-03-14T12:00:55.882939",
      "status": "completed"
     },
     "tags": []
    },
    "outputs": [
     {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "All 86,196,490 params unfrozen\n"
-     ]
-    },
-    {
      "name": "stderr",
      "output_type": "stream",
      "text": [
-      "Training: 100%|██████████| 834/834 [1:12:23<00:00,  5.21s/it]\n",
-      "Validation: 100%|██████████| 25/25 [00:18<00:00,  1.39it/s]\n"
+      "\u001b[34m\u001b[1mwandb\u001b[0m: W&B API key is configured. Use \u001b[1m`wandb login --relogin`\u001b[0m to force relogin\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: setting up run spxfbg1s\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: Tracking run with wandb version 0.22.2\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: Run data is saved locally in \u001b[35m\u001b[1m/kaggle/working/wandb/run-20260314_120056-spxfbg1s\u001b[0m\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: Run \u001b[1m`wandb offline`\u001b[0m to turn off syncing.\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: Syncing run \u001b[33mMFCC-LightGBM-Baseline\u001b[0m\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: ⭐️ View project at \u001b[34m\u001b[4mhttps://wandb.ai/choprayuvraj-iit-madras/24f2002642-t12026\u001b[0m\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: 🚀 View run at \u001b[34m\u001b[4mhttps://wandb.ai/choprayuvraj-iit-madras/24f2002642-t12026/runs/spxfbg1s\u001b[0m\n"
      ]
     },
     {
      "name": "stdout",
      "output_type": "stream",
      "text": [
-      "P2 Ep 1/5 | loss=0.7543 train_f1=0.9119 val_f1=0.8158\n"
-     ]
-    },
-    {
-     "name": "stderr",
-     "output_type": "stream",
-     "text": [
-      "Training: 100%|██████████| 834/834 [1:13:02<00:00,  5.25s/it]\n",
-      "Validation: 100%|██████████| 25/25 [00:17<00:00,  1.42it/s]\n"
-     ]
-    },
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "P2 Ep 2/5 | loss=0.6346 train_f1=0.9554 val_f1=0.8388\n"
-     ]
-    },
-    {
-     "name": "stderr",
-     "output_type": "stream",
-     "text": [
-      "Training: 100%|██████████| 834/834 [1:13:18<00:00,  5.27s/it]\n",
-      "Validation: 100%|██████████| 25/25 [00:17<00:00,  1.45it/s]\n"
-     ]
-    },
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "P2 Ep 3/5 | loss=0.5686 train_f1=0.9789 val_f1=0.8253\n"
-     ]
-    },
-    {
-     "name": "stderr",
-     "output_type": "stream",
-     "text": [
-      "Training: 100%|██████████| 834/834 [1:11:58<00:00,  5.18s/it]\n",
-      "Validation: 100%|██████████| 25/25 [00:17<00:00,  1.44it/s]\n"
-     ]
-    },
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "P2 Ep 4/5 | loss=0.5414 train_f1=0.9852 val_f1=0.8314\n"
-     ]
-    },
-    {
-     "name": "stderr",
-     "output_type": "stream",
-     "text": [
-      "Training: 100%|██████████| 834/834 [1:24:57<00:00,  6.11s/it]\n",
-      "Validation: 100%|██████████| 25/25 [00:21<00:00,  1.16it/s]\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: updating run metadata\n"
-     ]
-    },
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "P2 Ep 5/5 | loss=0.5318 train_f1=0.9885 val_f1=0.8324\n",
-      "Early stopping Phase 2.\n"
-     ]
-    },
-    {
-     "name": "stderr",
-     "output_type": "stream",
-     "text": [
-      "\u001b[34m\u001b[1mwandb\u001b[0m: \n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: Run history:\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m:      epoch ▁▃▅▁▃▅▆█\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m:      phase ▁▁▁█████\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m:   train_f1 ▁▆▆▆▇███\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: train_loss █▄▄▃▂▁▁▁\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m:     val_f1 ▁▇▆▆█▇▇▇\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: \n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: Run summary:\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m:      epoch 5\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m:      phase 2\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m:   train_f1 0.98848\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: train_loss 0.53181\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m:     val_f1 0.83238\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: \n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: 🚀 View run \u001b[33mAST-Two-Phase-Finetune\u001b[0m at: \u001b[34m\u001b[4mhttps://wandb.ai/choprayuvraj-iit-madras/24f2002642-t12026/runs/k9shv47q\u001b[0m\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: ⭐️ View project at: \u001b[34m\u001b[4mhttps://wandb.ai/choprayuvraj-iit-madras/24f2002642-t12026\u001b[0m\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)\n",
-      "\u001b[34m\u001b[1mwandb\u001b[0m: Find logs at: \u001b[35m\u001b[1m./wandb/run-20260309_111510-k9shv47q/logs\u001b[0m\n"
-     ]
-    },
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "Phase 2 done — best val F1: 0.8388\n"
+      "[50]\tvalid_0's multi_logloss: 0.450125\n",
+      "[100]\tvalid_0's multi_logloss: 0.301206\n",
+      "[150]\tvalid_0's multi_logloss: 0.272011\n",
+      "[200]\tvalid_0's multi_logloss: 0.26413\n",
+      "Fold 1 | val macro F1 = 0.9155 | best iter = 207\n",
+      "[50]\tvalid_0's multi_logloss: 0.419457\n",
+      "[100]\tvalid_0's multi_logloss: 0.271509\n",
+      "[150]\tvalid_0's multi_logloss: 0.236515\n",
+      "[200]\tvalid_0's multi_logloss: 0.229503\n",
+      "Fold 2 | val macro F1 = 0.9311 | best iter = 210\n",
+      "[50]\tvalid_0's multi_logloss: 0.400865\n",
+      "[100]\tvalid_0's multi_logloss: 0.260183\n",
+      "[150]\tvalid_0's multi_logloss: 0.234763\n",
+      "[200]\tvalid_0's multi_logloss: 0.227731\n",
+      "[250]\tvalid_0's multi_logloss: 0.227473\n",
+      "[300]\tvalid_0's multi_logloss: 0.227473\n",
+      "[350]\tvalid_0's multi_logloss: 0.227473\n",
+      "[400]\tvalid_0's multi_logloss: 0.227473\n",
+      "[450]\tvalid_0's multi_logloss: 0.227473\n",
+      "[500]\tvalid_0's multi_logloss: 0.227473\n",
+      "Fold 3 | val macro F1 = 0.9246 | best iter = 500\n",
+      "[50]\tvalid_0's multi_logloss: 0.421804\n",
+      "[100]\tvalid_0's multi_logloss: 0.263867\n",
+      "[150]\tvalid_0's multi_logloss: 0.233632\n",
+      "[200]\tvalid_0's multi_logloss: 0.223494\n",
+      "Fold 4 | val macro F1 = 0.9333 | best iter = 212\n",
+      "[50]\tvalid_0's multi_logloss: 0.449894\n",
+      "[100]\tvalid_0's multi_logloss: 0.303154\n",
+      "[150]\tvalid_0's multi_logloss: 0.271571\n",
+      "[200]\tvalid_0's multi_logloss: 0.267093\n",
+      "Fold 5 | val macro F1 = 0.9187 | best iter = 186\n",
+      "\n",
+      "CV mean macro F1: 0.9246\n"
      ]
     }
    ],
    "source": [
-    "model.load_state_dict(torch.load('/kaggle/working/best_model_phase1.pth'))\n",
+    "params = {\n",
+    "    'objective'        : 'multiclass',\n",
+    "    'num_class'        : len(GENRES),\n",
+    "    'metric'           : 'multi_logloss',\n",
+    "    'learning_rate'    : 0.05,\n",
+    "    'num_leaves'       : 63,\n",
+    "    'max_depth'        : -1,\n",
+    "    'min_child_samples': 20,\n",
+    "    'subsample'        : 0.8,\n",
+    "    'colsample_bytree' : 0.8,\n",
+    "    'reg_alpha'        : 0.1,\n",
+    "    'reg_lambda'       : 0.1,\n",
+    "    'n_jobs'           : -1,\n",
+    "    'verbose'          : -1,\n",
+    "    'seed'             : 42,\n",
+    "}\n",
     "\n",
-    "for param in model.parameters():\n",
-    "    param.requires_grad = True\n",
-    "\n",
-    "total_params = sum(p.numel() for p in model.parameters())\n",
-    "print(f'All {total_params:,} params unfrozen')\n",
-    "\n",
-    "optimizer_p2 = torch.optim.AdamW([\n",
-    "    {'params': model.base_model.parameters(),  'lr': LR_P2},\n",
-    "    {'params': model.classifier.parameters(),  'lr': LR_P2 * LR_HEAD_MULT},\n",
-    "], weight_decay=WEIGHT_DECAY)\n",
-    "\n",
-    "total_steps_p2 = (len(train_loader) // GRAD_ACCUM) * EPOCHS_P2\n",
-    "scheduler_p2   = get_cosine_schedule_with_warmup(\n",
-    "    optimizer_p2,\n",
-    "    num_warmup_steps   = total_steps_p2 // 10,\n",
-    "    num_training_steps = total_steps_p2\n",
+    "run = wandb.init(\n",
+    "    entity  = 'choprayuvraj-iit-madras',\n",
+    "    project = '24f2002642-t12026',\n",
+    "    name    = 'MFCC-LightGBM-Baseline',\n",
+    "    config  = {\n",
+    "        'model'           : 'LightGBM',\n",
+    "        'features'        : 'MFCC+Chroma+Contrast+RMS+ZCR+Rolloff',\n",
+    "        'n_mfcc'          : N_MFCC,\n",
+    "        'duration'        : DURATION,\n",
+    "        'clips_per_song'  : CLIPS_PER_SONG,\n",
+    "        'songs_per_genre' : SONGS_PER_GENRE,\n",
+    "        'learning_rate'   : params['learning_rate'],\n",
+    "        'num_leaves'      : params['num_leaves'],\n",
+    "    }\n",
     ")\n",
     "\n",
-    "best_p2_f1   = 0\n",
-    "patience_cnt = 0\n",
+    "skf     = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)\n",
+    "oof_f1s = []\n",
+    "models  = []\n",
     "\n",
-    "for epoch in range(EPOCHS_P2):\n",
-    "    train_loss, train_f1 = train_one_epoch(model, train_loader, optimizer_p2, scheduler_p2)\n",
-    "    val_f1 = validate(model, val_loader)\n",
+    "for fold, (tr_idx, va_idx) in enumerate(skf.split(X_train, y_train)):\n",
+    "    X_tr, X_va = X_train[tr_idx], X_train[va_idx]\n",
+    "    y_tr, y_va = y_train[tr_idx], y_train[va_idx]\n",
     "\n",
-    "    wandb.log({'phase': 2, 'epoch': epoch + 1, 'train_loss': train_loss,\n",
-    "               'train_f1': train_f1, 'val_f1': val_f1})\n",
-    "    print(f'P2 Ep {epoch+1}/{EPOCHS_P2} | loss={train_loss:.4f} train_f1={train_f1:.4f} val_f1={val_f1:.4f}')\n",
+    "    dtrain = lgb.Dataset(X_tr, label=y_tr)\n",
+    "    dval   = lgb.Dataset(X_va, label=y_va, reference=dtrain)\n",
     "\n",
-    "    if val_f1 > best_p2_f1:\n",
-    "        best_p2_f1   = val_f1\n",
-    "        patience_cnt = 0\n",
-    "        torch.save(model.state_dict(), '/kaggle/working/best_model_phase2.pth')\n",
-    "    else:\n",
-    "        patience_cnt += 1\n",
-    "        if patience_cnt >= PATIENCE_P2:\n",
-    "            print('Early stopping Phase 2.')\n",
-    "            break\n",
+    "    model = lgb.train(\n",
+    "        params,\n",
+    "        dtrain,\n",
+    "        num_boost_round      = 500,\n",
+    "        valid_sets           = [dval],\n",
+    "        callbacks            = [\n",
+    "            lgb.early_stopping(stopping_rounds=30, verbose=False),\n",
+    "            lgb.log_evaluation(period=50)\n",
+    "        ]\n",
+    "    )\n",
     "\n",
-    "wandb.finish()\n",
-    "print(f'Phase 2 done — best val F1: {best_p2_f1:.4f}')"
+    "    preds = model.predict(X_va) \n",
+    "    pred_labels = np.argmax(preds, axis=1)\n",
+    "    f1  = f1_score(y_va, pred_labels, average='macro')\n",
+    "    oof_f1s.append(f1)\n",
+    "    models.append(model)\n",
+    "\n",
+    "    wandb.log({'fold': fold + 1, 'val_f1': f1})\n",
+    "    print(f'Fold {fold+1} | val macro F1 = {f1:.4f} | best iter = {model.best_iteration}')\n",
+    "\n",
+    "mean_f1 = np.mean(oof_f1s)\n",
+    "wandb.log({'cv_mean_f1': mean_f1})\n",
+    "print(f'\\nCV mean macro F1: {mean_f1:.4f}')"
    ]
   },
   {
    "cell_type": "markdown",
-   "id": "a16e2fa4",
+   "id": "5786b2b2",
    "metadata": {
     "papermill": {
-     "duration": 0.307763,
-     "end_time": "2026-03-09T21:08:22.932798",
+     "duration": 0.030801,
+     "end_time": "2026-03-14T12:01:23.999243",
      "exception": false,
-     "start_time": "2026-03-09T21:08:22.625035",
+     "start_time": "2026-03-14T12:01:23.968442",
      "status": "completed"
     },
     "tags": []
    },
    "source": [
-    "## 11. TTA Inference & Submission"
+    "## 6. Test Inference & Submission"
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": 13,
-   "id": "4a6639b5",
+   "execution_count": 7,
+   "id": "70286d1e",
    "metadata": {
     "execution": {
-     "iopub.execute_input": "2026-03-09T21:08:23.659515Z",
-     "iopub.status.busy": "2026-03-09T21:08:23.658494Z",
-     "iopub.status.idle": "2026-03-09T21:25:50.024878Z",
-     "shell.execute_reply": "2026-03-09T21:25:50.023357Z"
+     "iopub.execute_input": "2026-03-14T12:01:24.063500Z",
+     "iopub.status.busy": "2026-03-14T12:01:24.062947Z",
+     "iopub.status.idle": "2026-03-14T12:32:14.622478Z",
+     "shell.execute_reply": "2026-03-14T12:32:14.621768Z"
     },
     "papermill": {
-     "duration": 1046.788244,
-     "end_time": "2026-03-09T21:25:50.026842",
+     "duration": 1850.593285,
+     "end_time": "2026-03-14T12:32:14.623945",
      "exception": false,
-     "start_time": "2026-03-09T21:08:23.238598",
+     "start_time": "2026-03-14T12:01:24.030660",
      "status": "completed"
     },
     "tags": []
@@ -1240,7 +606,24 @@
      "name": "stderr",
      "output_type": "stream",
      "text": [
-      "Inference (TTA x5): 100%|██████████| 3020/3020 [17:25<00:00,  2.89it/s]"
+      "Inference: 100%|██████████| 3020/3020 [30:49<00:00,  1.63it/s]\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: updating run metadata\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: uploading data\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: \n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: Run history:\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: cv_mean_f1 ▁\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m:       fold ▁▃▅▆█\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m:     val_f1 ▁▇▅█▂\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: \n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: Run summary:\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: cv_mean_f1 0.92463\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m:       fold 5\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m:     val_f1 0.91866\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: \n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: 🚀 View run \u001b[33mMFCC-LightGBM-Baseline\u001b[0m at: \u001b[34m\u001b[4mhttps://wandb.ai/choprayuvraj-iit-madras/24f2002642-t12026/runs/spxfbg1s\u001b[0m\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: ⭐️ View project at: \u001b[34m\u001b[4mhttps://wandb.ai/choprayuvraj-iit-madras/24f2002642-t12026\u001b[0m\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)\n",
+      "\u001b[34m\u001b[1mwandb\u001b[0m: Find logs at: \u001b[35m\u001b[1m./wandb/run-20260314_120056-spxfbg1s/logs\u001b[0m\n"
      ]
     },
     {
@@ -1248,51 +631,22 @@
      "output_type": "stream",
      "text": [
       "genre\n",
-      "blues        426\n",
-      "rock         340\n",
-      "reggae       319\n",
-      "disco        311\n",
-      "hiphop       310\n",
-      "metal        310\n",
-      "jazz         306\n",
-      "pop          277\n",
-      "classical    212\n",
-      "country      209\n",
+      "reggae       1477\n",
+      "pop           752\n",
+      "hiphop        317\n",
+      "rock          191\n",
+      "jazz           96\n",
+      "metal          64\n",
+      "classical      56\n",
+      "country        44\n",
+      "disco          23\n",
       "Name: count, dtype: int64\n"
-     ]
-    },
-    {
-     "name": "stderr",
-     "output_type": "stream",
-     "text": [
-      "\n"
      ]
     }
    ],
    "source": [
-    "def predict_with_tta(model, audio, n_tta=N_TTA):\n",
-    "    all_probs = []\n",
-    "    for _ in range(n_tta):\n",
-    "        cropped = crop_random(audio)\n",
-    "        cropped = normalize(cropped)\n",
-    "        inputs  = feature_extractor(\n",
-    "            cropped,\n",
-    "            sampling_rate  = SAMPLE_RATE,\n",
-    "            return_tensors = 'pt'\n",
-    "        )\n",
-    "        input_values = inputs['input_values'].to(DEVICE)\n",
-    "        with torch.no_grad():\n",
-    "            outputs = model(input_values=input_values)\n",
-    "            probs   = torch.softmax(outputs.logits, dim=1)\n",
-    "            all_probs.append(probs.cpu().numpy())\n",
-    "    avg_probs = np.mean(all_probs, axis=0)\n",
-    "    return np.argmax(avg_probs, axis=1)[0]\n",
-    "\n",
-    "\n",
-    "model.load_state_dict(torch.load('/kaggle/working/best_model_phase2.pth'))\n",
-    "model.eval()\n",
-    "\n",
-    "test_df    = pd.read_csv(os.path.join(BASE_PATH, 'test.csv'))\n",
+    "N_TTA    = 5\n",
+    "test_df  = pd.read_csv(os.path.join(BASE_PATH, 'test.csv'))\n",
     "\n",
     "id_to_file = {}\n",
     "for f in os.listdir(MASHUPS_PATH):\n",
@@ -1304,23 +658,38 @@
     "all_ids   = []\n",
     "all_preds = []\n",
     "\n",
-    "for idx in tqdm(range(len(test_df)), desc=f'Inference (TTA x{N_TTA})'):\n",
-    "    row   = test_df.iloc[idx]\n",
-    "    sid   = row['id']\n",
+    "for idx in tqdm(range(len(test_df)), desc='Inference'):\n",
+    "    sid   = test_df.iloc[idx]['id']\n",
     "    fname = id_to_file.get(sid)\n",
-    "    label = 'pop'\n",
+    "    label = 'pop'   # fallback\n",
+    "\n",
     "    if fname:\n",
     "        try:\n",
-    "            audio = load_audio(os.path.join(MASHUPS_PATH, fname))\n",
-    "            pred  = predict_with_tta(model, audio, n_tta=N_TTA)\n",
-    "            label = id2label[pred]\n",
-    "        except Exception:\n",
-    "            pass\n",
+    "            audio, _ = librosa.load(\n",
+    "                os.path.join(MASHUPS_PATH, fname),\n",
+    "                sr=SAMPLE_RATE, mono=True\n",
+    "            )\n",
+    "            audio = audio / (np.max(np.abs(audio)) + 1e-6)\n",
+    "\n",
+    "            avg_probs = np.zeros(len(GENRES))\n",
+    "            for _ in range(N_TTA):\n",
+    "                clip  = random_crop(audio)\n",
+    "                feats = extract_features(clip).reshape(1, -1)\n",
+    "                # average predictions across all 5 CV folds\n",
+    "                fold_probs = np.mean([m.predict(feats)[0] for m in models], axis=0)\n",
+    "                avg_probs += fold_probs\n",
+    "\n",
+    "            label = id2label[int(np.argmax(avg_probs))]\n",
+    "        except Exception as e:\n",
+    "            print(f'  skip {sid}: {e}')\n",
+    "\n",
     "    all_ids.append(sid)\n",
     "    all_preds.append(label)\n",
     "\n",
     "submission = pd.DataFrame({'id': all_ids, 'genre': all_preds})\n",
-    "submission.to_csv('/kaggle/working/submission.csv', index=False)\n",
+    "submission.to_csv('/kaggle/working/submission_lgbm.csv', index=False)\n",
+    "\n",
+    "wandb.finish()\n",
     "print(submission['genre'].value_counts())"
    ]
   }
@@ -1361,1103 +730,15 @@
   },
   "papermill": {
    "default_parameters": {},
-   "duration": 36696.818989,
-   "end_time": "2026-03-09T21:25:53.183303",
+   "duration": 2442.256538,
+   "end_time": "2026-03-14T12:32:16.190295",
    "environment_variables": {},
    "exception": null,
    "input_path": "__notebook__.ipynb",
    "output_path": "__notebook__.ipynb",
    "parameters": {},
-   "start_time": "2026-03-09T11:14:16.364314",
+   "start_time": "2026-03-14T11:51:33.933757",
    "version": "2.6.0"
-  },
-  "widgets": {
-   "application/vnd.jupyter.widget-state+json": {
-    "state": {
-     "033a715291124c3b9e079cd871815bb0": {
-      "model_module": "@jupyter-widgets/base",
-      "model_module_version": "2.0.0",
-      "model_name": "LayoutModel",
-      "state": {
-       "_model_module": "@jupyter-widgets/base",
-       "_model_module_version": "2.0.0",
-       "_model_name": "LayoutModel",
-       "_view_count": null,
-       "_view_module": "@jupyter-widgets/base",
-       "_view_module_version": "2.0.0",
-       "_view_name": "LayoutView",
-       "align_content": null,
-       "align_items": null,
-       "align_self": null,
-       "border_bottom": null,
-       "border_left": null,
-       "border_right": null,
-       "border_top": null,
-       "bottom": null,
-       "display": null,
-       "flex": null,
-       "flex_flow": null,
-       "grid_area": null,
-       "grid_auto_columns": null,
-       "grid_auto_flow": null,
-       "grid_auto_rows": null,
-       "grid_column": null,
-       "grid_gap": null,
-       "grid_row": null,
-       "grid_template_areas": null,
-       "grid_template_columns": null,
-       "grid_template_rows": null,
-       "height": null,
-       "justify_content": null,
-       "justify_items": null,
-       "left": null,
-       "margin": null,
-       "max_height": null,
-       "max_width": null,
-       "min_height": null,
-       "min_width": null,
-       "object_fit": null,
-       "object_position": null,
-       "order": null,
-       "overflow": null,
-       "padding": null,
-       "right": null,
-       "top": null,
-       "visibility": null,
-       "width": null
-      }
-     },
-     "03f5df8b2f44451c838ae76e5595bab8": {
-      "model_module": "@jupyter-widgets/base",
-      "model_module_version": "2.0.0",
-      "model_name": "LayoutModel",
-      "state": {
-       "_model_module": "@jupyter-widgets/base",
-       "_model_module_version": "2.0.0",
-       "_model_name": "LayoutModel",
-       "_view_count": null,
-       "_view_module": "@jupyter-widgets/base",
-       "_view_module_version": "2.0.0",
-       "_view_name": "LayoutView",
-       "align_content": null,
-       "align_items": null,
-       "align_self": null,
-       "border_bottom": null,
-       "border_left": null,
-       "border_right": null,
-       "border_top": null,
-       "bottom": null,
-       "display": null,
-       "flex": null,
-       "flex_flow": null,
-       "grid_area": null,
-       "grid_auto_columns": null,
-       "grid_auto_flow": null,
-       "grid_auto_rows": null,
-       "grid_column": null,
-       "grid_gap": null,
-       "grid_row": null,
-       "grid_template_areas": null,
-       "grid_template_columns": null,
-       "grid_template_rows": null,
-       "height": null,
-       "justify_content": null,
-       "justify_items": null,
-       "left": null,
-       "margin": null,
-       "max_height": null,
-       "max_width": null,
-       "min_height": null,
-       "min_width": null,
-       "object_fit": null,
-       "object_position": null,
-       "order": null,
-       "overflow": null,
-       "padding": null,
-       "right": null,
-       "top": null,
-       "visibility": null,
-       "width": null
-      }
-     },
-     "08b40295e9014fe18047b98641db3f7b": {
-      "model_module": "@jupyter-widgets/base",
-      "model_module_version": "2.0.0",
-      "model_name": "LayoutModel",
-      "state": {
-       "_model_module": "@jupyter-widgets/base",
-       "_model_module_version": "2.0.0",
-       "_model_name": "LayoutModel",
-       "_view_count": null,
-       "_view_module": "@jupyter-widgets/base",
-       "_view_module_version": "2.0.0",
-       "_view_name": "LayoutView",
-       "align_content": null,
-       "align_items": null,
-       "align_self": null,
-       "border_bottom": null,
-       "border_left": null,
-       "border_right": null,
-       "border_top": null,
-       "bottom": null,
-       "display": null,
-       "flex": null,
-       "flex_flow": null,
-       "grid_area": null,
-       "grid_auto_columns": null,
-       "grid_auto_flow": null,
-       "grid_auto_rows": null,
-       "grid_column": null,
-       "grid_gap": null,
-       "grid_row": null,
-       "grid_template_areas": null,
-       "grid_template_columns": null,
-       "grid_template_rows": null,
-       "height": null,
-       "justify_content": null,
-       "justify_items": null,
-       "left": null,
-       "margin": null,
-       "max_height": null,
-       "max_width": null,
-       "min_height": null,
-       "min_width": null,
-       "object_fit": null,
-       "object_position": null,
-       "order": null,
-       "overflow": null,
-       "padding": null,
-       "right": null,
-       "top": null,
-       "visibility": null,
-       "width": null
-      }
-     },
-     "0cc6e5df61154431a4117acd9e775ff8": {
-      "model_module": "@jupyter-widgets/controls",
-      "model_module_version": "2.0.0",
-      "model_name": "ProgressStyleModel",
-      "state": {
-       "_model_module": "@jupyter-widgets/controls",
-       "_model_module_version": "2.0.0",
-       "_model_name": "ProgressStyleModel",
-       "_view_count": null,
-       "_view_module": "@jupyter-widgets/base",
-       "_view_module_version": "2.0.0",
-       "_view_name": "StyleView",
-       "bar_color": null,
-       "description_width": ""
-      }
-     },
-     "143146af1bac478eb6ab9aa7ab132129": {
-      "model_module": "@jupyter-widgets/base",
-      "model_module_version": "2.0.0",
-      "model_name": "LayoutModel",
-      "state": {
-       "_model_module": "@jupyter-widgets/base",
-       "_model_module_version": "2.0.0",
-       "_model_name": "LayoutModel",
-       "_view_count": null,
-       "_view_module": "@jupyter-widgets/base",
-       "_view_module_version": "2.0.0",
-       "_view_name": "LayoutView",
-       "align_content": null,
-       "align_items": null,
-       "align_self": null,
-       "border_bottom": null,
-       "border_left": null,
-       "border_right": null,
-       "border_top": null,
-       "bottom": null,
-       "display": null,
-       "flex": null,
-       "flex_flow": null,
-       "grid_area": null,
-       "grid_auto_columns": null,
-       "grid_auto_flow": null,
-       "grid_auto_rows": null,
-       "grid_column": null,
-       "grid_gap": null,
-       "grid_row": null,
-       "grid_template_areas": null,
-       "grid_template_columns": null,
-       "grid_template_rows": null,
-       "height": null,
-       "justify_content": null,
-       "justify_items": null,
-       "left": null,
-       "margin": null,
-       "max_height": null,
-       "max_width": null,
-       "min_height": null,
-       "min_width": null,
-       "object_fit": null,
-       "object_position": null,
-       "order": null,
-       "overflow": null,
-       "padding": null,
-       "right": null,
-       "top": null,
-       "visibility": null,
-       "width": "20px"
-      }
-     },
-     "25461f91a27443f893a3ae02a2c23d9e": {
-      "model_module": "@jupyter-widgets/base",
-      "model_module_version": "2.0.0",
-      "model_name": "LayoutModel",
-      "state": {
-       "_model_module": "@jupyter-widgets/base",
-       "_model_module_version": "2.0.0",
-       "_model_name": "LayoutModel",
-       "_view_count": null,
-       "_view_module": "@jupyter-widgets/base",
-       "_view_module_version": "2.0.0",
-       "_view_name": "LayoutView",
-       "align_content": null,
-       "align_items": null,
-       "align_self": null,
-       "border_bottom": null,
-       "border_left": null,
-       "border_right": null,
-       "border_top": null,
-       "bottom": null,
-       "display": null,
-       "flex": null,
-       "flex_flow": null,
-       "grid_area": null,
-       "grid_auto_columns": null,
-       "grid_auto_flow": null,
-       "grid_auto_rows": null,
-       "grid_column": null,
-       "grid_gap": null,
-       "grid_row": null,
-       "grid_template_areas": null,
-       "grid_template_columns": null,
-       "grid_template_rows": null,
-       "height": null,
-       "justify_content": null,
-       "justify_items": null,
-       "left": null,
-       "margin": null,
-       "max_height": null,
-       "max_width": null,
-       "min_height": null,
-       "min_width": null,
-       "object_fit": null,
-       "object_position": null,
-       "order": null,
-       "overflow": null,
-       "padding": null,
-       "right": null,
-       "top": null,
-       "visibility": null,
-       "width": null
-      }
-     },
-     "25bb82f77d6e4c598ac06ee5f5d5f82d": {
-      "model_module": "@jupyter-widgets/controls",
-      "model_module_version": "2.0.0",
-      "model_name": "FloatProgressModel",
-      "state": {
-       "_dom_classes": [],
-       "_model_module": "@jupyter-widgets/controls",
-       "_model_module_version": "2.0.0",
-       "_model_name": "FloatProgressModel",
-       "_view_count": null,
-       "_view_module": "@jupyter-widgets/controls",
-       "_view_module_version": "2.0.0",
-       "_view_name": "ProgressView",
-       "bar_style": "success",
-       "description": "",
-       "description_allow_html": false,
-       "layout": "IPY_MODEL_56a404b66bb044cdb2cf8215e26ea7e8",
-       "max": 297.0,
-       "min": 0.0,
-       "orientation": "horizontal",
-       "style": "IPY_MODEL_b26f26c5647d4a3b9a804ffa01008b82",
-       "tabbable": null,
-       "tooltip": null,
-       "value": 297.0
-      }
-     },
-     "28058d8e9f9c4933941dc383fa7ff34d": {
-      "model_module": "@jupyter-widgets/controls",
-      "model_module_version": "2.0.0",
-      "model_name": "HBoxModel",
-      "state": {
-       "_dom_classes": [],
-       "_model_module": "@jupyter-widgets/controls",
-       "_model_module_version": "2.0.0",
-       "_model_name": "HBoxModel",
-       "_view_count": null,
-       "_view_module": "@jupyter-widgets/controls",
-       "_view_module_version": "2.0.0",
-       "_view_name": "HBoxView",
-       "box_style": "",
-       "children": [
-        "IPY_MODEL_6b6107f11dee4e0b9cdf1808f7b86ff0",
-        "IPY_MODEL_a368d300c2b64a1693cebb50002a4c8a",
-        "IPY_MODEL_49f493f9d1754f64a14c77afee20a6c4"
-       ],
-       "layout": "IPY_MODEL_a0b1367481444603a5d1729502c0d764",
-       "tabbable": null,
-       "tooltip": null
-      }
-     },
-     "2b970bef46e54acda36a9aba856954b1": {
-      "model_module": "@jupyter-widgets/base",
-      "model_module_version": "2.0.0",
-      "model_name": "LayoutModel",
-      "state": {
-       "_model_module": "@jupyter-widgets/base",
-       "_model_module_version": "2.0.0",
-       "_model_name": "LayoutModel",
-       "_view_count": null,
-       "_view_module": "@jupyter-widgets/base",
-       "_view_module_version": "2.0.0",
-       "_view_name": "LayoutView",
-       "align_content": null,
-       "align_items": null,
-       "align_self": null,
-       "border_bottom": null,
-       "border_left": null,
-       "border_right": null,
-       "border_top": null,
-       "bottom": null,
-       "display": null,
-       "flex": null,
-       "flex_flow": null,
-       "grid_area": null,
-       "grid_auto_columns": null,
-       "grid_auto_flow": null,
-       "grid_auto_rows": null,
-       "grid_column": null,
-       "grid_gap": null,
-       "grid_row": null,
-       "grid_template_areas": null,
-       "grid_template_columns": null,
-       "grid_template_rows": null,
-       "height": null,
-       "justify_content": null,
-       "justify_items": null,
-       "left": null,
-       "margin": null,
-       "max_height": null,
-       "max_width": null,
-       "min_height": null,
-       "min_width": null,
-       "object_fit": null,
-       "object_position": null,
-       "order": null,
-       "overflow": null,
-       "padding": null,
-       "right": null,
-       "top": null,
-       "visibility": null,
-       "width": null
-      }
-     },
-     "2c982f8479e245e3b6e90538bdeeb21a": {
-      "model_module": "@jupyter-widgets/controls",
-      "model_module_version": "2.0.0",
-      "model_name": "HTMLModel",
-      "state": {
-       "_dom_classes": [],
-       "_model_module": "@jupyter-widgets/controls",
-       "_model_module_version": "2.0.0",
-       "_model_name": "HTMLModel",
-       "_view_count": null,
-       "_view_module": "@jupyter-widgets/controls",
-       "_view_module_version": "2.0.0",
-       "_view_name": "HTMLView",
-       "description": "",
-       "description_allow_html": false,
-       "layout": "IPY_MODEL_80d6551441d44798a139e1343e6b516a",
-       "placeholder": "​",
-       "style": "IPY_MODEL_83306c5d103542ea8af32d94f746d785",
-       "tabbable": null,
-       "tooltip": null,
-       "value": "preprocessor_config.json: 100%"
-      }
-     },
-     "2d3db808cc6b4e8497569311c1f8fd17": {
-      "model_module": "@jupyter-widgets/controls",
-      "model_module_version": "2.0.0",
-      "model_name": "HTMLModel",
-      "state": {
-       "_dom_classes": [],
-       "_model_module": "@jupyter-widgets/controls",
-       "_model_module_version": "2.0.0",
-       "_model_name": "HTMLModel",
-       "_view_count": null,
-       "_view_module": "@jupyter-widgets/controls",
-       "_view_module_version": "2.0.0",
-       "_view_name": "HTMLView",
-       "description": "",
-       "description_allow_html": false,
-       "layout": "IPY_MODEL_033a715291124c3b9e079cd871815bb0",
-       "placeholder": "​",
-       "style": "IPY_MODEL_b7386e21b213402eb5c4f77bcfa3d3d6",
-       "tabbable": null,
-       "tooltip": null,
-       "value": "config.json: "
-      }
-     },
-     "3e904e464a7141e7b2329affc25fd002": {
-      "model_module": "@jupyter-widgets/controls",
-      "model_module_version": "2.0.0",
-      "model_name": "ProgressStyleModel",
-      "state": {
-       "_model_module": "@jupyter-widgets/controls",
-       "_model_module_version": "2.0.0",
-       "_model_name": "ProgressStyleModel",
-       "_view_count": null,
-       "_view_module": "@jupyter-widgets/base",
-       "_view_module_version": "2.0.0",
-       "_view_name": "StyleView",
-       "bar_color": null,
-       "description_width": ""
-      }
-     },
-     "49f493f9d1754f64a14c77afee20a6c4": {
-      "model_module": "@jupyter-widgets/controls",
-      "model_module_version": "2.0.0",
-      "model_name": "HTMLModel",
-      "state": {
-       "_dom_classes": [],
-       "_model_module": "@jupyter-widgets/controls",
-       "_model_module_version": "2.0.0",
-       "_model_name": "HTMLModel",
-       "_view_count": null,
-       "_view_module": "@jupyter-widgets/controls",
-       "_view_module_version": "2.0.0",
-       "_view_name": "HTMLView",
-       "description": "",
-       "description_allow_html": false,
-       "layout": "IPY_MODEL_25461f91a27443f893a3ae02a2c23d9e",
-       "placeholder": "​",
-       "style": "IPY_MODEL_f324b843252e43c3b452673a0bf60daf",
-       "tabbable": null,
-       "tooltip": null,
-       "value": " 346M/346M [00:06&lt;00:00, 80.8MB/s]"
-      }
-     },
-     "56a404b66bb044cdb2cf8215e26ea7e8": {
-      "model_module": "@jupyter-widgets/base",
-      "model_module_version": "2.0.0",
-      "model_name": "LayoutModel",
-      "state": {
-       "_model_module": "@jupyter-widgets/base",
-       "_model_module_version": "2.0.0",
-       "_model_name": "LayoutModel",
-       "_view_count": null,
-       "_view_module": "@jupyter-widgets/base",
-       "_view_module_version": "2.0.0",
-       "_view_name": "LayoutView",
-       "align_content": null,
-       "align_items": null,
-       "align_self": null,
-       "border_bottom": null,
-       "border_left": null,
-       "border_right": null,
-       "border_top": null,
-       "bottom": null,
-       "display": null,
-       "flex": null,
-       "flex_flow": null,
-       "grid_area": null,
-       "grid_auto_columns": null,
-       "grid_auto_flow": null,
-       "grid_auto_rows": null,
-       "grid_column": null,
-       "grid_gap": null,
-       "grid_row": null,
-       "grid_template_areas": null,
-       "grid_template_columns": null,
-       "grid_template_rows": null,
-       "height": null,
-       "justify_content": null,
-       "justify_items": null,
-       "left": null,
-       "margin": null,
-       "max_height": null,
-       "max_width": null,
-       "min_height": null,
-       "min_width": null,
-       "object_fit": null,
-       "object_position": null,
-       "order": null,
-       "overflow": null,
-       "padding": null,
-       "right": null,
-       "top": null,
-       "visibility": null,
-       "width": null
-      }
-     },
-     "6b6107f11dee4e0b9cdf1808f7b86ff0": {
-      "model_module": "@jupyter-widgets/controls",
-      "model_module_version": "2.0.0",
-      "model_name": "HTMLModel",
-      "state": {
-       "_dom_classes": [],
-       "_model_module": "@jupyter-widgets/controls",
-       "_model_module_version": "2.0.0",
-       "_model_name": "HTMLModel",
-       "_view_count": null,
-       "_view_module": "@jupyter-widgets/controls",
-       "_view_module_version": "2.0.0",
-       "_view_name": "HTMLView",
-       "description": "",
-       "description_allow_html": false,
-       "layout": "IPY_MODEL_8f284ac6176b4e989cfd69989a9a4806",
-       "placeholder": "​",
-       "style": "IPY_MODEL_9c0327f766834b539554b5cbcb5c42b2",
-       "tabbable": null,
-       "tooltip": null,
-       "value": "model.safetensors: 100%"
-      }
-     },
-     "775b5b246dbb43ecb4f2e57aaaba3853": {
-      "model_module": "@jupyter-widgets/controls",
-      "model_module_version": "2.0.0",
-      "model_name": "HBoxModel",
-      "state": {
-       "_dom_classes": [],
-       "_model_module": "@jupyter-widgets/controls",
-       "_model_module_version": "2.0.0",
-       "_model_name": "HBoxModel",
-       "_view_count": null,
-       "_view_module": "@jupyter-widgets/controls",
-       "_view_module_version": "2.0.0",
-       "_view_name": "HBoxView",
-       "box_style": "",
-       "children": [
-        "IPY_MODEL_2d3db808cc6b4e8497569311c1f8fd17",
-        "IPY_MODEL_a1d4dddef1e04c139287df8ae588634c",
-        "IPY_MODEL_e03122139a2d4faf829bf2e49dd970bd"
-       ],
-       "layout": "IPY_MODEL_c4f4df24fdc741c084b85c970fbeea26",
-       "tabbable": null,
-       "tooltip": null
-      }
-     },
-     "80d6551441d44798a139e1343e6b516a": {
-      "model_module": "@jupyter-widgets/base",
-      "model_module_version": "2.0.0",
-      "model_name": "LayoutModel",
-      "state": {
-       "_model_module": "@jupyter-widgets/base",
-       "_model_module_version": "2.0.0",
-       "_model_name": "LayoutModel",
-       "_view_count": null,
-       "_view_module": "@jupyter-widgets/base",
-       "_view_module_version": "2.0.0",
-       "_view_name": "LayoutView",
-       "align_content": null,
-       "align_items": null,
-       "align_self": null,
-       "border_bottom": null,
-       "border_left": null,
-       "border_right": null,
-       "border_top": null,
-       "bottom": null,
-       "display": null,
-       "flex": null,
-       "flex_flow": null,
-       "grid_area": null,
-       "grid_auto_columns": null,
-       "grid_auto_flow": null,
-       "grid_auto_rows": null,
-       "grid_column": null,
-       "grid_gap": null,
-       "grid_row": null,
-       "grid_template_areas": null,
-       "grid_template_columns": null,
-       "grid_template_rows": null,
-       "height": null,
-       "justify_content": null,
-       "justify_items": null,
-       "left": null,
-       "margin": null,
-       "max_height": null,
-       "max_width": null,
-       "min_height": null,
-       "min_width": null,
-       "object_fit": null,
-       "object_position": null,
-       "order": null,
-       "overflow": null,
-       "padding": null,
-       "right": null,
-       "top": null,
-       "visibility": null,
-       "width": null
-      }
-     },
-     "83306c5d103542ea8af32d94f746d785": {
-      "model_module": "@jupyter-widgets/controls",
-      "model_module_version": "2.0.0",
-      "model_name": "HTMLStyleModel",
-      "state": {
-       "_model_module": "@jupyter-widgets/controls",
-       "_model_module_version": "2.0.0",
-       "_model_name": "HTMLStyleModel",
-       "_view_count": null,
-       "_view_module": "@jupyter-widgets/base",
-       "_view_module_version": "2.0.0",
-       "_view_name": "StyleView",
-       "background": null,
-       "description_width": "",
-       "font_size": null,
-       "text_color": null
-      }
-     },
-     "8f284ac6176b4e989cfd69989a9a4806": {
-      "model_module": "@jupyter-widgets/base",
-      "model_module_version": "2.0.0",
-      "model_name": "LayoutModel",
-      "state": {
-       "_model_module": "@jupyter-widgets/base",
-       "_model_module_version": "2.0.0",
-       "_model_name": "LayoutModel",
-       "_view_count": null,
-       "_view_module": "@jupyter-widgets/base",
-       "_view_module_version": "2.0.0",
-       "_view_name": "LayoutView",
-       "align_content": null,
-       "align_items": null,
-       "align_self": null,
-       "border_bottom": null,
-       "border_left": null,
-       "border_right": null,
-       "border_top": null,
-       "bottom": null,
-       "display": null,
-       "flex": null,
-       "flex_flow": null,
-       "grid_area": null,
-       "grid_auto_columns": null,
-       "grid_auto_flow": null,
-       "grid_auto_rows": null,
-       "grid_column": null,
-       "grid_gap": null,
-       "grid_row": null,
-       "grid_template_areas": null,
-       "grid_template_columns": null,
-       "grid_template_rows": null,
-       "height": null,
-       "justify_content": null,
-       "justify_items": null,
-       "left": null,
-       "margin": null,
-       "max_height": null,
-       "max_width": null,
-       "min_height": null,
-       "min_width": null,
-       "object_fit": null,
-       "object_position": null,
-       "order": null,
-       "overflow": null,
-       "padding": null,
-       "right": null,
-       "top": null,
-       "visibility": null,
-       "width": null
-      }
-     },
-     "9c0327f766834b539554b5cbcb5c42b2": {
-      "model_module": "@jupyter-widgets/controls",
-      "model_module_version": "2.0.0",
-      "model_name": "HTMLStyleModel",
-      "state": {
-       "_model_module": "@jupyter-widgets/controls",
-       "_model_module_version": "2.0.0",
-       "_model_name": "HTMLStyleModel",
-       "_view_count": null,
-       "_view_module": "@jupyter-widgets/base",
-       "_view_module_version": "2.0.0",
-       "_view_name": "StyleView",
-       "background": null,
-       "description_width": "",
-       "font_size": null,
-       "text_color": null
-      }
-     },
-     "a0b1367481444603a5d1729502c0d764": {
-      "model_module": "@jupyter-widgets/base",
-      "model_module_version": "2.0.0",
-      "model_name": "LayoutModel",
-      "state": {
-       "_model_module": "@jupyter-widgets/base",
-       "_model_module_version": "2.0.0",
-       "_model_name": "LayoutModel",
-       "_view_count": null,
-       "_view_module": "@jupyter-widgets/base",
-       "_view_module_version": "2.0.0",
-       "_view_name": "LayoutView",
-       "align_content": null,
-       "align_items": null,
-       "align_self": null,
-       "border_bottom": null,
-       "border_left": null,
-       "border_right": null,
-       "border_top": null,
-       "bottom": null,
-       "display": null,
-       "flex": null,
-       "flex_flow": null,
-       "grid_area": null,
-       "grid_auto_columns": null,
-       "grid_auto_flow": null,
-       "grid_auto_rows": null,
-       "grid_column": null,
-       "grid_gap": null,
-       "grid_row": null,
-       "grid_template_areas": null,
-       "grid_template_columns": null,
-       "grid_template_rows": null,
-       "height": null,
-       "justify_content": null,
-       "justify_items": null,
-       "left": null,
-       "margin": null,
-       "max_height": null,
-       "max_width": null,
-       "min_height": null,
-       "min_width": null,
-       "object_fit": null,
-       "object_position": null,
-       "order": null,
-       "overflow": null,
-       "padding": null,
-       "right": null,
-       "top": null,
-       "visibility": null,
-       "width": null
-      }
-     },
-     "a1d4dddef1e04c139287df8ae588634c": {
-      "model_module": "@jupyter-widgets/controls",
-      "model_module_version": "2.0.0",
-      "model_name": "FloatProgressModel",
-      "state": {
-       "_dom_classes": [],
-       "_model_module": "@jupyter-widgets/controls",
-       "_model_module_version": "2.0.0",
-       "_model_name": "FloatProgressModel",
-       "_view_count": null,
-       "_view_module": "@jupyter-widgets/controls",
-       "_view_module_version": "2.0.0",
-       "_view_name": "ProgressView",
-       "bar_style": "success",
-       "description": "",
-       "description_allow_html": false,
-       "layout": "IPY_MODEL_143146af1bac478eb6ab9aa7ab132129",
-       "max": 1.0,
-       "min": 0.0,
-       "orientation": "horizontal",
-       "style": "IPY_MODEL_3e904e464a7141e7b2329affc25fd002",
-       "tabbable": null,
-       "tooltip": null,
-       "value": 1.0
-      }
-     },
-     "a368d300c2b64a1693cebb50002a4c8a": {
-      "model_module": "@jupyter-widgets/controls",
-      "model_module_version": "2.0.0",
-      "model_name": "FloatProgressModel",
-      "state": {
-       "_dom_classes": [],
-       "_model_module": "@jupyter-widgets/controls",
-       "_model_module_version": "2.0.0",
-       "_model_name": "FloatProgressModel",
-       "_view_count": null,
-       "_view_module": "@jupyter-widgets/controls",
-       "_view_module_version": "2.0.0",
-       "_view_name": "ProgressView",
-       "bar_style": "success",
-       "description": "",
-       "description_allow_html": false,
-       "layout": "IPY_MODEL_08b40295e9014fe18047b98641db3f7b",
-       "max": 346404948.0,
-       "min": 0.0,
-       "orientation": "horizontal",
-       "style": "IPY_MODEL_0cc6e5df61154431a4117acd9e775ff8",
-       "tabbable": null,
-       "tooltip": null,
-       "value": 346404948.0
-      }
-     },
-     "a431eeed5f994af28b07220dbd785353": {
-      "model_module": "@jupyter-widgets/controls",
-      "model_module_version": "2.0.0",
-      "model_name": "HBoxModel",
-      "state": {
-       "_dom_classes": [],
-       "_model_module": "@jupyter-widgets/controls",
-       "_model_module_version": "2.0.0",
-       "_model_name": "HBoxModel",
-       "_view_count": null,
-       "_view_module": "@jupyter-widgets/controls",
-       "_view_module_version": "2.0.0",
-       "_view_name": "HBoxView",
-       "box_style": "",
-       "children": [
-        "IPY_MODEL_2c982f8479e245e3b6e90538bdeeb21a",
-        "IPY_MODEL_25bb82f77d6e4c598ac06ee5f5d5f82d",
-        "IPY_MODEL_ffbab87974864ada9e376a02ae87af40"
-       ],
-       "layout": "IPY_MODEL_03f5df8b2f44451c838ae76e5595bab8",
-       "tabbable": null,
-       "tooltip": null
-      }
-     },
-     "b26f26c5647d4a3b9a804ffa01008b82": {
-      "model_module": "@jupyter-widgets/controls",
-      "model_module_version": "2.0.0",
-      "model_name": "ProgressStyleModel",
-      "state": {
-       "_model_module": "@jupyter-widgets/controls",
-       "_model_module_version": "2.0.0",
-       "_model_name": "ProgressStyleModel",
-       "_view_count": null,
-       "_view_module": "@jupyter-widgets/base",
-       "_view_module_version": "2.0.0",
-       "_view_name": "StyleView",
-       "bar_color": null,
-       "description_width": ""
-      }
-     },
-     "b7386e21b213402eb5c4f77bcfa3d3d6": {
-      "model_module": "@jupyter-widgets/controls",
-      "model_module_version": "2.0.0",
-      "model_name": "HTMLStyleModel",
-      "state": {
-       "_model_module": "@jupyter-widgets/controls",
-       "_model_module_version": "2.0.0",
-       "_model_name": "HTMLStyleModel",
-       "_view_count": null,
-       "_view_module": "@jupyter-widgets/base",
-       "_view_module_version": "2.0.0",
-       "_view_name": "StyleView",
-       "background": null,
-       "description_width": "",
-       "font_size": null,
-       "text_color": null
-      }
-     },
-     "c4f4df24fdc741c084b85c970fbeea26": {
-      "model_module": "@jupyter-widgets/base",
-      "model_module_version": "2.0.0",
-      "model_name": "LayoutModel",
-      "state": {
-       "_model_module": "@jupyter-widgets/base",
-       "_model_module_version": "2.0.0",
-       "_model_name": "LayoutModel",
-       "_view_count": null,
-       "_view_module": "@jupyter-widgets/base",
-       "_view_module_version": "2.0.0",
-       "_view_name": "LayoutView",
-       "align_content": null,
-       "align_items": null,
-       "align_self": null,
-       "border_bottom": null,
-       "border_left": null,
-       "border_right": null,
-       "border_top": null,
-       "bottom": null,
-       "display": null,
-       "flex": null,
-       "flex_flow": null,
-       "grid_area": null,
-       "grid_auto_columns": null,
-       "grid_auto_flow": null,
-       "grid_auto_rows": null,
-       "grid_column": null,
-       "grid_gap": null,
-       "grid_row": null,
-       "grid_template_areas": null,
-       "grid_template_columns": null,
-       "grid_template_rows": null,
-       "height": null,
-       "justify_content": null,
-       "justify_items": null,
-       "left": null,
-       "margin": null,
-       "max_height": null,
-       "max_width": null,
-       "min_height": null,
-       "min_width": null,
-       "object_fit": null,
-       "object_position": null,
-       "order": null,
-       "overflow": null,
-       "padding": null,
-       "right": null,
-       "top": null,
-       "visibility": null,
-       "width": null
-      }
-     },
-     "cdfd9b0dd29f4fe59f5b3c74bfb5dce5": {
-      "model_module": "@jupyter-widgets/base",
-      "model_module_version": "2.0.0",
-      "model_name": "LayoutModel",
-      "state": {
-       "_model_module": "@jupyter-widgets/base",
-       "_model_module_version": "2.0.0",
-       "_model_name": "LayoutModel",
-       "_view_count": null,
-       "_view_module": "@jupyter-widgets/base",
-       "_view_module_version": "2.0.0",
-       "_view_name": "LayoutView",
-       "align_content": null,
-       "align_items": null,
-       "align_self": null,
-       "border_bottom": null,
-       "border_left": null,
-       "border_right": null,
-       "border_top": null,
-       "bottom": null,
-       "display": null,
-       "flex": null,
-       "flex_flow": null,
-       "grid_area": null,
-       "grid_auto_columns": null,
-       "grid_auto_flow": null,
-       "grid_auto_rows": null,
-       "grid_column": null,
-       "grid_gap": null,
-       "grid_row": null,
-       "grid_template_areas": null,
-       "grid_template_columns": null,
-       "grid_template_rows": null,
-       "height": null,
-       "justify_content": null,
-       "justify_items": null,
-       "left": null,
-       "margin": null,
-       "max_height": null,
-       "max_width": null,
-       "min_height": null,
-       "min_width": null,
-       "object_fit": null,
-       "object_position": null,
-       "order": null,
-       "overflow": null,
-       "padding": null,
-       "right": null,
-       "top": null,
-       "visibility": null,
-       "width": null
-      }
-     },
-     "e03122139a2d4faf829bf2e49dd970bd": {
-      "model_module": "@jupyter-widgets/controls",
-      "model_module_version": "2.0.0",
-      "model_name": "HTMLModel",
-      "state": {
-       "_dom_classes": [],
-       "_model_module": "@jupyter-widgets/controls",
-       "_model_module_version": "2.0.0",
-       "_model_name": "HTMLModel",
-       "_view_count": null,
-       "_view_module": "@jupyter-widgets/controls",
-       "_view_module_version": "2.0.0",
-       "_view_name": "HTMLView",
-       "description": "",
-       "description_allow_html": false,
-       "layout": "IPY_MODEL_2b970bef46e54acda36a9aba856954b1",
-       "placeholder": "​",
-       "style": "IPY_MODEL_f767a9e98b744b6793b185586e8d3180",
-       "tabbable": null,
-       "tooltip": null,
-       "value": " 26.8k/? [00:00&lt;00:00, 2.73MB/s]"
-      }
-     },
-     "e1fc379fc974494bbc344f6060b48cef": {
-      "model_module": "@jupyter-widgets/controls",
-      "model_module_version": "2.0.0",
-      "model_name": "HTMLStyleModel",
-      "state": {
-       "_model_module": "@jupyter-widgets/controls",
-       "_model_module_version": "2.0.0",
-       "_model_name": "HTMLStyleModel",
-       "_view_count": null,
-       "_view_module": "@jupyter-widgets/base",
-       "_view_module_version": "2.0.0",
-       "_view_name": "StyleView",
-       "background": null,
-       "description_width": "",
-       "font_size": null,
-       "text_color": null
-      }
-     },
-     "f324b843252e43c3b452673a0bf60daf": {
-      "model_module": "@jupyter-widgets/controls",
-      "model_module_version": "2.0.0",
-      "model_name": "HTMLStyleModel",
-      "state": {
-       "_model_module": "@jupyter-widgets/controls",
-       "_model_module_version": "2.0.0",
-       "_model_name": "HTMLStyleModel",
-       "_view_count": null,
-       "_view_module": "@jupyter-widgets/base",
-       "_view_module_version": "2.0.0",
-       "_view_name": "StyleView",
-       "background": null,
-       "description_width": "",
-       "font_size": null,
-       "text_color": null
-      }
-     },
-     "f767a9e98b744b6793b185586e8d3180": {
-      "model_module": "@jupyter-widgets/controls",
-      "model_module_version": "2.0.0",
-      "model_name": "HTMLStyleModel",
-      "state": {
-       "_model_module": "@jupyter-widgets/controls",
-       "_model_module_version": "2.0.0",
-       "_model_name": "HTMLStyleModel",
-       "_view_count": null,
-       "_view_module": "@jupyter-widgets/base",
-       "_view_module_version": "2.0.0",
-       "_view_name": "StyleView",
-       "background": null,
-       "description_width": "",
-       "font_size": null,
-       "text_color": null
-      }
-     },
-     "ffbab87974864ada9e376a02ae87af40": {
-      "model_module": "@jupyter-widgets/controls",
-      "model_module_version": "2.0.0",
-      "model_name": "HTMLModel",
-      "state": {
-       "_dom_classes": [],
-       "_model_module": "@jupyter-widgets/controls",
-       "_model_module_version": "2.0.0",
-       "_model_name": "HTMLModel",
-       "_view_count": null,
-       "_view_module": "@jupyter-widgets/controls",
-       "_view_module_version": "2.0.0",
-       "_view_name": "HTMLView",
-       "description": "",
-       "description_allow_html": false,
-       "layout": "IPY_MODEL_cdfd9b0dd29f4fe59f5b3c74bfb5dce5",
-       "placeholder": "​",
-       "style": "IPY_MODEL_e1fc379fc974494bbc344f6060b48cef",
-       "tabbable": null,
-       "tooltip": null,
-       "value": " 297/297 [00:00&lt;00:00, 34.8kB/s]"
-      }
-     }
-    },
-    "version_major": 2,
-    "version_minor": 0
-   }
   }
  },
  "nbformat": 4,
