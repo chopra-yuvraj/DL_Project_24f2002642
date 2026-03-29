@@ -1,0 +1,13 @@
+name: Keep Hugging Face Space Awake
+
+on:
+  schedule:
+    - cron: '0 */12 * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping HF Space
+        run: curl -I https://huggingface.co/spaces/Yuvraj-Chopra/DL-GEN-AI-Project
