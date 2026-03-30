@@ -1,9 +1,5 @@
 {
-  "redirects": [
-    {
-      "source": "/",
-      "destination": "https://yuvraj-chopra-dl-gen-ai-project.hf.space",
-      "permanent": false
-    }
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
