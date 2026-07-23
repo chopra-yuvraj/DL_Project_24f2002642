@@ -58,10 +58,23 @@
   </header>
   <div class="frame-wrap">
     <iframe
-      src="https://yuvraj-chopra-dl-gen-ai-project.hf.space"
+      id="spotiknow-frame"
       allow="microphone"
       loading="lazy"
     ></iframe>
   </div>
+
+  <script>
+    // The Gradio Space rebuilds its static assets (hashed filenames under
+    // /_app/immutable/...) on every deploy and deletes the old ones. If a
+    // visitor's browser has a cached copy of the Space's HTML from a
+    // previous deploy, it points at asset files that no longer exist and
+    // the app fails to boot (404s + "failed to fetch dynamically imported
+    // module" in the console). Appending a fresh query string on every
+    // page load stops the browser from reusing that cached HTML, so it
+    // always fetches the current build's entry page instead.
+    document.getElementById('spotiknow-frame').src =
+      'https://yuvraj-chopra-dl-gen-ai-project.hf.space?cachebust=' + Date.now();
+  </script>
 </body>
 </html>
