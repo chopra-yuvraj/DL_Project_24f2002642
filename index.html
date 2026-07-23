@@ -38,9 +38,35 @@
       letter-spacing: 0.1em;
     }
 
+    .fallback-link {
+      margin-left: auto;
+      font-size: 0.65rem;
+      color: #555;
+      letter-spacing: 0.06em;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .fallback-link:hover {
+      color: #999;
+    }
+
     .frame-wrap {
       flex: 1;
       overflow: hidden;
+      position: relative;
+    }
+
+    #loading-msg {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      color: #444;
+      letter-spacing: 0.08em;
+      pointer-events: none;
     }
 
     iframe {
@@ -48,6 +74,8 @@
       height: 100%;
       border: none;
       display: block;
+      position: relative;
+      z-index: 1;
     }
   </style>
 </head>
@@ -55,8 +83,12 @@
   <header>
     <span class="logo">spotiknow</span>
     <span class="sub">music genre classifier &nbsp;·&nbsp; 24f2002642 &nbsp;·&nbsp; IIT Madras T1-2026</span>
+    <a class="fallback-link" href="https://yuvraj-chopra-dl-gen-ai-project.hf.space" target="_blank" rel="noopener">
+      having trouble? open directly &rarr;
+    </a>
   </header>
   <div class="frame-wrap">
+    <div id="loading-msg">loading spotiknow&hellip;</div>
     <iframe
       id="spotiknow-frame"
       allow="microphone"
@@ -73,8 +105,23 @@
     // module" in the console). Appending a fresh query string on every
     // page load stops the browser from reusing that cached HTML, so it
     // always fetches the current build's entry page instead.
-    document.getElementById('spotiknow-frame').src =
-      'https://yuvraj-chopra-dl-gen-ai-project.hf.space?cachebust=' + Date.now();
+    var frame = document.getElementById('spotiknow-frame');
+    var loadingMsg = document.getElementById('loading-msg');
+
+    // "load" fires once the iframe's own document has finished loading -
+    // this hides the loading message once *something* has rendered.
+    // Note: this can't detect JS errors happening inside the iframe's
+    // own page (that's a different origin, the browser won't let this
+    // parent page see into it) - it only confirms the document itself
+    // loaded. If the app still looks broken after this fires, the fix
+    // isn't on this page; it's the fallback link above, or a fresh
+    // console log so the underlying issue on the Space side can be
+    // pinned down.
+    frame.addEventListener('load', function () {
+      loadingMsg.style.display = 'none';
+    });
+
+    frame.src = 'https://yuvraj-chopra-dl-gen-ai-project.hf.space?cachebust=' + Date.now();
   </script>
 </body>
 </html>
