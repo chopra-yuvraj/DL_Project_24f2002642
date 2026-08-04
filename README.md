@@ -1,4 +1,4 @@
-# DL_Project_24f2002642
+# Spotiknow
 
 Messy Mashup DL & GenAI Project, T1-2026  
 IIT Madras BS Data Science | Roll No: 24f2002642
